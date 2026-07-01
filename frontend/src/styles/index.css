@@ -1,0 +1,112 @@
+/* ══════════════════════════════════════════════
+   Global Stylesheet Entry Point
+   Import order matters — tokens first, then reset,
+   then animations, then overrides.
+   ══════════════════════════════════════════════ */
+
+@import './tokens.css';
+@import './reset.css';
+@import './animations.css';
+
+/* ══ Leaflet Map Overrides ══ */
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--color-bg) !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* Hide default attribution (we style it below) */
+.leaflet-control-attribution {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-light) !important;
+  color: var(--color-text-muted) !important;
+  font-size: var(--text-2xs) !important;
+  border-radius: var(--r-xs) 0 0 0 !important;
+  padding: 3px 8px !important;
+  border: none !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-primary-light) !important;
+}
+
+/* Remove default zoom controls (using custom ones) */
+.leaflet-control-zoom {
+  display: none !important;
+}
+
+/* ══ User Location Marker Styles ══
+   These live here because Leaflet DivIcons render
+   outside of React's component tree.
+*/
+
+.user-location-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.user-location-wrapper {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  background: #4285F4;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  z-index: 2;
+  animation: pulse-dot 2.5s ease-in-out infinite;
+  box-shadow: 0 2px 10px rgba(66, 133, 244, 0.60);
+}
+
+.user-location-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(66, 133, 244, 0.28);
+  animation: location-ripple 2.5s ease-out infinite;
+}
+
+.user-location-ripple:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+/* ══ Scrollbar ══ */
+::-webkit-scrollbar           { width: 4px; height: 4px; }
+::-webkit-scrollbar-track     { background: transparent; }
+::-webkit-scrollbar-thumb     { background: var(--glass-border-strong); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ══ Text Selection ══ */
+::selection {
+  background: var(--color-primary-alpha);
+  color: var(--color-primary-light);
+}
+
+/* ══ Focus Visible ══ */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+/* ══ Reusable Glass Card Utility ══ */
+.glass-card {
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+}

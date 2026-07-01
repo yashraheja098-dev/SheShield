@@ -1,0 +1,140 @@
+/* ══════════════════════════════════════
+   MapShell — Full-screen layer layout
+   All positioning happens here.
+   Components never position themselves.
+   ══════════════════════════════════════ */
+
+/* ── Shell wrapper fills the entire viewport ── */
+.map-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ── Layer base (shared) ── */
+.layer {
+  position: absolute;
+  pointer-events: none; /* Transparent by default; re-enable below */
+}
+
+/* ══ Layer 0: Map ══ */
+.layer--map {
+  inset: 0;
+  z-index: var(--z-map);
+  pointer-events: all;
+}
+
+/* ══ Layer 1: Top Controls ══ */
+.layer--top {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-ui);
+  padding: var(--sp-4) var(--sp-4) 0;
+  pointer-events: none;
+}
+
+/* Support mobile safe area (notch) */
+@supports (padding: env(safe-area-inset-top)) {
+  .layer--top {
+    padding-top: calc(var(--sp-4) + env(safe-area-inset-top));
+  }
+}
+
+.top-controls-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: 560px;
+  margin: 0 auto;
+  pointer-events: all;
+}
+
+/* ── App Brand ── */
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) 0;
+  animation: anim-slide-down var(--transition-slow) both;
+}
+
+.app-brand-shield {
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(233, 30, 140, 0.6));
+}
+
+.app-brand-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-extrabold);
+  background: linear-gradient(120deg, #E91E8C 0%, #F48FB1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
+}
+
+/* ══ Layer 2: Map Controls ══ */
+.layer--controls {
+  right: var(--sp-4);
+  bottom: 220px;  /* above bottom sheet */
+  z-index: var(--z-controls);
+  pointer-events: all;
+  animation: anim-fade-in 0.6s 0.3s both;
+}
+
+/* ══ Layer 3: SOS FAB ══ */
+.layer--sos {
+  right: var(--sp-4);
+  bottom: 140px;  /* just above bottom sheet */
+  z-index: var(--z-sos);
+  pointer-events: all;
+  animation: anim-scale-in-spring 0.5s 0.4s both;
+}
+
+/* ══ Layer 4: Bottom Sheet ══ */
+.layer--bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-sheet);
+  pointer-events: all;
+}
+
+/* ══ Desktop Layout ══
+   On wider screens, constrain the floating UI to a sidebar-like
+   max-width while keeping the map full screen behind it.
+*/
+@media (min-width: 768px) {
+  .top-controls-wrap {
+    max-width: 440px;
+    margin: 0;  /* left-aligned on desktop */
+  }
+
+  .layer--controls {
+    right: var(--sp-6);
+    bottom: 240px;
+  }
+
+  .layer--sos {
+    right: var(--sp-6);
+    bottom: 160px;
+  }
+
+  .layer--bottom {
+    left: 0;
+    right: auto;
+    width: 420px;
+    bottom: 0;
+    border-right: 1px solid var(--glass-border);
+  }
+}
+
+@media (min-width: 1024px) {
+  .layer--bottom {
+    width: 440px;
+  }
+}

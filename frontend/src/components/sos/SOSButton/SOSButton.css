@@ -1,0 +1,264 @@
+/* ══════════════════════════
+   SOSButton Styles
+   ══════════════════════════ */
+
+/* ── FAB ── */
+.sos-fab {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+
+  background: linear-gradient(145deg, #FF1744 0%, #C2185B 100%);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 4px 24px rgba(255, 23, 68, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+
+  animation: sos-pulse 2.2s ease-in-out infinite;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sos-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 32px rgba(255, 23, 68, 0.70);
+}
+
+.sos-fab:active {
+  transform: scale(0.94);
+}
+
+.sos-fab.counting {
+  animation: none;
+  background: linear-gradient(145deg, #FF6F00, #E65100);
+  box-shadow: 0 4px 24px rgba(255, 111, 0, 0.55);
+}
+
+/* ── FAB Label ── */
+.sos-fab-label {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: 0.06em;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  user-select: none;
+}
+
+/* ── Pulse Rings ── */
+.sos-fab-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 23, 68, 0.5);
+  animation: sos-ring 2.2s ease-out infinite;
+}
+
+.sos-fab-ring--2 {
+  animation-delay: 0.6s;
+}
+
+/* ══ Countdown Overlay ══ */
+
+.sos-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: anim-fade-in var(--transition-fast) both;
+  padding: var(--sp-6);
+}
+
+.sos-overlay-card {
+  background: var(--glass-bg-heavy);
+  border: 1px solid rgba(255, 23, 68, 0.30);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-8) var(--sp-10);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 340px;
+  box-shadow: var(--shadow-xl), var(--shadow-glow-danger);
+}
+
+/* ── Countdown Ring SVG ── */
+.sos-ring-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sos-ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.sos-ring-track {
+  stroke: rgba(255, 23, 68, 0.15);
+}
+
+.sos-ring-progress {
+  stroke: var(--color-danger);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.9s linear;
+  filter: drop-shadow(0 0 6px var(--color-danger));
+}
+
+.sos-ring-number {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: var(--weight-extrabold);
+  color: var(--color-danger);
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.sos-overlay-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.sos-overlay-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  max-width: 260px;
+}
+
+.sos-cancel-btn {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--glass-border-strong);
+  color: var(--color-text-primary);
+  padding: var(--sp-3) var(--sp-8);
+  border-radius: var(--r-full);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  transition:
+    background var(--transition-fast),
+    transform  var(--transition-fast);
+}
+
+.sos-cancel-btn:hover {
+  background: var(--color-surface-alt);
+  transform: scale(1.03);
+}
+
+/* ══ Active SOS Screen ══ */
+
+.sos-active-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(213, 0, 0, 0.12);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-sos);
+  padding: var(--sp-6);
+  animation: anim-fade-in var(--transition-base) both;
+}
+
+.sos-active-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-5);
+  text-align: center;
+  background: var(--glass-bg-heavy);
+  border: 1px solid rgba(255, 23, 68, 0.35);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-10);
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-xl), var(--shadow-glow-danger);
+}
+
+.sos-active-icon {
+  width: 88px;
+  height: 88px;
+  background: var(--color-danger-alpha);
+  border-radius: var(--r-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-danger);
+  animation: breathe 1.5s ease-in-out infinite;
+}
+
+.sos-active-title {
+  font-size: var(--text-2xl);
+  color: var(--color-danger);
+}
+
+.sos-active-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  max-width: 280px;
+}
+
+.sos-call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--color-danger);
+  color: #fff;
+  padding: var(--sp-3) var(--sp-8);
+  border-radius: var(--r-full);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  box-shadow: 0 4px 16px rgba(255, 23, 68, 0.45);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sos-call-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px rgba(255, 23, 68, 0.6);
+}
+
+.sos-safe-btn {
+  background: var(--color-safe-alpha);
+  border: 1px solid var(--color-safe);
+  color: var(--color-safe);
+  padding: var(--sp-3) var(--sp-8);
+  border-radius: var(--r-full);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  transition:
+    background  var(--transition-fast),
+    transform   var(--transition-fast);
+}
+
+.sos-safe-btn:hover {
+  background: rgba(0, 230, 118, 0.22);
+  transform: scale(1.03);
+}

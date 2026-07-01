@@ -1,0 +1,12 @@
+/* MapContainer — fills its parent absolutely */
+
+.she-map-container {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+}
+
+.she-map-canvas {
+  width: 100%;
+  height: 100%;
+}
