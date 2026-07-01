@@ -1,131 +1,87 @@
 /**
- * Mock static datasets for SheShield MVP.
- * Seeded around New Delhi, India.
- *
- * Format notes:
- *   heatmap:    [lat, lng, intensity]  intensity ∈ [0, 1]
- *   safePoints: typed place objects matching the planned API response shape
+ * Mock static datasets and generators for SheShield MVP.
  */
 
-/* ── Mock Heat Map Intensity Data ──
-   Night-weighted incident density around central Delhi.
-   High values = high risk areas.
-*/
-export const MOCK_HEATMAP_DATA = [
-  // Paharganj area - higher risk at night
-  [28.6441, 77.2138, 0.90],
-  [28.6428, 77.2100, 0.85],
-  [28.6450, 77.2200, 0.80],
-  // Sadar Bazaar
-  [28.6568, 77.2047, 0.75],
-  [28.6550, 77.2060, 0.70],
-  // Near Nizamuddin
-  [28.5920, 77.2480, 0.65],
-  [28.5880, 77.2500, 0.60],
-  // Lower risk - Connaught Place area
-  [28.6315, 77.2167, 0.30],
-  [28.6280, 77.2120, 0.25],
-  [28.6340, 77.2200, 0.20],
-  // India Gate area - safer
-  [28.6129, 77.2295, 0.15],
-  [28.6100, 77.2280, 0.10],
-  // Karol Bagh - mixed
-  [28.6519, 77.1909, 0.55],
-  [28.6500, 77.1880, 0.50],
-  [28.6540, 77.1930, 0.45],
-];
+// Generate random coordinates around a base location within a max offset
+const getRandomOffset = (maxOffset = 0.05) => (Math.random() - 0.5) * maxOffset;
 
-/* ── Mock Safe Points ──
-   Typed exactly as the planned real API will return.
-*/
-export const MOCK_SAFE_POINTS = [
-  {
-    id:         'sp_police_001',
-    type:       'police',
-    name:       'Connaught Place Police Station',
-    address:    'Connaught Place, New Delhi - 110001',
-    lat:        28.6315,
-    lng:        77.2167,
-    distance:   450,
-    isOpen24h:  true,
-    phone:      '100',
-    rating:     4.1,
-  },
-  {
-    id:         'sp_hospital_001',
-    type:       'hospital',
-    name:       'Ram Manohar Lohia Hospital',
-    address:    'Baba Kharak Singh Marg, New Delhi',
-    lat:        28.6271,
-    lng:        77.2022,
-    distance:   820,
-    isOpen24h:  true,
-    phone:      '011-23365525',
-    rating:     4.3,
-  },
-  {
-    id:         'sp_metro_001',
-    type:       'metro',
-    name:       'Rajiv Chowk Metro Station',
-    address:    'Connaught Place, New Delhi',
-    lat:        28.6328,
-    lng:        77.2197,
-    distance:   380,
-    isOpen24h:  false,
-    phone:      null,
-    rating:     4.6,
-  },
-  {
-    id:         'sp_pharmacy_001',
-    type:       'pharmacy',
-    name:       'Apollo Pharmacy 24/7',
-    address:    'Janpath, New Delhi',
-    lat:        28.6250,
-    lng:        77.2180,
-    distance:   290,
-    isOpen24h:  true,
-    phone:      '1860-500-0101',
-    rating:     4.4,
-  },
-  {
-    id:         'sp_womens_001',
-    type:       'womens_desk',
-    name:       "Women's Help Desk — CP",
-    address:    'Connaught Place Police Station, New Delhi',
-    lat:        28.6320,
-    lng:        77.2170,
-    distance:   460,
-    isOpen24h:  true,
-    phone:      '1091',
-    rating:     4.5,
-  },
-  {
-    id:         'sp_petrol_001',
-    type:       'petrol_pump',
-    name:       'HP Petrol Pump',
-    address:    'Sansad Marg, New Delhi',
-    lat:        28.6248,
-    lng:        77.2095,
-    distance:   620,
-    isOpen24h:  true,
-    phone:      null,
-    rating:     3.9,
-  },
-  {
-    id:         'sp_hotel_001',
-    type:       'hotel',
-    name:       'The Metropolitan Hotel',
-    address:    'Bangla Sahib Marg, New Delhi',
-    lat:        28.6340,
-    lng:        77.2105,
-    distance:   750,
-    isOpen24h:  true,
-    phone:      '011-23410101',
-    rating:     4.7,
-  },
-];
+/**
+ * Generate Mock Heatmap Data around a location.
+ * @param {number} lat 
+ * @param {number} lng 
+ * @returns {Array} [lat, lng, intensity]
+ */
+export const generateMockHeatmapData = (lat, lng) => {
+  const points = [];
+  const numClusters = 5;
+  const pointsPerCluster = 10;
 
-/* ── Mock Search Suggestions ── */
+  for (let i = 0; i < numClusters; i++) {
+    const clusterLat = lat + getRandomOffset(0.08);
+    const clusterLng = lng + getRandomOffset(0.08);
+    const baseIntensity = 0.3 + Math.random() * 0.7; // 0.3 to 1.0
+
+    for (let j = 0; j < pointsPerCluster; j++) {
+      points.push([
+        clusterLat + getRandomOffset(0.015),
+        clusterLng + getRandomOffset(0.015),
+        baseIntensity * (0.8 + Math.random() * 0.2) // slight variation
+      ]);
+    }
+  }
+
+  return points;
+};
+
+/**
+ * Generate Mock Safe Points around a location.
+ * @param {number} lat 
+ * @param {number} lng 
+ * @returns {Array} List of safe points
+ */
+export const generateMockSafePoints = (lat, lng) => {
+  const points = [];
+  
+  const types = [
+    { type: 'police', name: 'Police Station', isOpen24h: true, phone: '100' },
+    { type: 'hospital', name: 'City Hospital', isOpen24h: true, phone: '102' },
+    { type: 'metro', name: 'Metro Station', isOpen24h: false, phone: null },
+    { type: 'pharmacy', name: '24/7 Pharmacy', isOpen24h: true, phone: '104' },
+    { type: 'womens_desk', name: "Women's Help Desk", isOpen24h: true, phone: '1091' },
+  ];
+
+  // Generate a few of each type
+  let idCounter = 1;
+  types.forEach(t => {
+    const count = Math.floor(Math.random() * 3) + 3; // 3 to 5 of each
+    for (let i = 0; i < count; i++) {
+      const pLat = lat + getRandomOffset(0.06);
+      const pLng = lng + getRandomOffset(0.06);
+      
+      // Calculate rough distance in meters
+      const dLat = (pLat - lat) * 111320;
+      const dLng = (pLng - lng) * 400000 * Math.cos(lat * Math.PI / 180) / 360;
+      const distance = Math.floor(Math.sqrt(dLat * dLat + dLng * dLng));
+
+      points.push({
+        id: `sp_${t.type}_00${idCounter++}`,
+        type: t.type,
+        name: `${t.name} ${i + 1}`,
+        address: `Sector ${Math.floor(Math.random() * 50) + 1}, Nearby`,
+        lat: pLat,
+        lng: pLng,
+        distance,
+        isOpen24h: t.isOpen24h,
+        phone: t.phone,
+        rating: (3.5 + Math.random() * 1.5).toFixed(1),
+      });
+    }
+  });
+
+  return points.sort((a, b) => a.distance - b.distance);
+};
+
+/* ── Mock Search Suggestions (Still static for fallback) ── */
 export const MOCK_SEARCH_RESULTS = [
   { id: 's1', name: 'Connaught Place',       subtitle: 'New Delhi, Delhi',          lat: 28.6315, lng: 77.2167, type: 'area'     },
   { id: 's2', name: 'India Gate',            subtitle: 'Rajpath, New Delhi',        lat: 28.6129, lng: 77.2295, type: 'landmark'  },

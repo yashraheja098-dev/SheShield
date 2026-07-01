@@ -5,6 +5,8 @@ import useNavigationStore from '../../../stores/navigationStore';
 import { ACTIVE_TILE, DEFAULT_CENTER, DEFAULT_ZOOM, NAVIGATION_ZOOM } from '../../../constants/mapConstants';
 import UserLocationPin from '../UserLocationPin/UserLocationPin';
 import RouteLayer from '../RouteLayer/RouteLayer';
+import HeatmapLayer from '../HeatmapLayer/HeatmapLayer';
+import SafePointsLayer from '../SafePointsLayer/SafePointsLayer';
 import './MapContainer.css';
 
 /* ── Inner: registers the map instance in Zustand ── */
@@ -53,9 +55,11 @@ const MapContainer = () => {
 
         <MapController />
 
+        <HeatmapLayer />
+        
         <RouteLayer />
         
-        {/* Phase 3: HeatMapLayer, SafePointMarkers go here */}
+        <SafePointsLayer />
 
         <UserLocationPin position={userPosition} />
       </LeafletMapContainer>

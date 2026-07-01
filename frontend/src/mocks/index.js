@@ -10,8 +10,8 @@
  * axios calls to the real endpoints. Zero component changes needed.
  */
 import {
-  MOCK_HEATMAP_DATA,
-  MOCK_SAFE_POINTS,
+  generateMockHeatmapData,
+  generateMockSafePoints,
   MOCK_SEARCH_RESULTS,
 } from './safetyData';
 
@@ -95,19 +95,23 @@ export const mockApi = {
   },
 
   /**
-   * Fetch heat map intensity tiles for a given time slot.
-   * Real API: GET /safety/heatmap?slot={timeSlotId}
+   * Fetch heat map intensity tiles for a given time slot around lat, lng.
+   * Real API: GET /safety/heatmap?slot={timeSlotId}&lat={lat}&lng={lng}
    */
-  getHeatMapData: async (timeSlotId) => {
+  getHeatMapData: async (timeSlotId, lat, lng) => {
     await delay(jitter(400));
     // Night/dusk → higher intensities; day → dampened
     const multiplier = timeSlotId === 'night' ? 1.0
                      : timeSlotId === 'dusk'  ? 0.85
                      : timeSlotId === 'dawn'  ? 0.65
                      : 0.45;
-    return MOCK_HEATMAP_DATA.map(([lat, lng, intensity]) => [
-      lat,
-      lng,
+                     
+    // Generate data around the user's location
+    const heatmapData = generateMockHeatmapData(lat, lng);
+    
+    return heatmapData.map(([ptLat, ptLng, intensity]) => [
+      ptLat,
+      ptLng,
       Math.min(intensity * multiplier, 1),
     ]);
   },
@@ -118,6 +122,7 @@ export const mockApi = {
    */
   getSafePoints: async (lat, lng, radiusM, type = null) => {
     await delay(jitter(480));
-    return MOCK_SAFE_POINTS.filter((p) => !type || p.type === type);
+    const points = generateMockSafePoints(lat, lng);
+    return points.filter((p) => !type || p.type === type);
   },
 };

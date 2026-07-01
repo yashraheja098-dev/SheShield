@@ -1,0 +1,100 @@
+.custom-safe-point-icon {
+  background: transparent;
+  border: none;
+}
+
+.safe-point-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 2px solid white;
+  transition: transform 0.2s;
+}
+
+.safe-point-marker:hover {
+  transform: scale(1.1);
+}
+
+.safe-point-marker svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Colors by type */
+.marker-police { background: #1e88e5; }
+.marker-hospital { background: #e53935; }
+.marker-metro { background: #fdd835; color: #333; border-color: #333; }
+.marker-pharmacy { background: #43a047; }
+.marker-womens_desk { background: #d81b60; }
+.marker-default { background: #8e24aa; }
+
+/* Popup Styling */
+.safe-point-popup .leaflet-popup-content-wrapper {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  color: var(--color-text-primary);
+  padding: 0;
+  overflow: hidden;
+}
+
+.safe-point-popup .leaflet-popup-tip {
+  background: var(--glass-bg-heavy);
+  border: 1px solid var(--glass-border);
+}
+
+.safe-point-popup-content {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.safe-point-popup-content h3 {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.sp-type {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+
+.sp-distance {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.sp-navigate-btn {
+  margin-top: var(--sp-3);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--r-md);
+  padding: var(--sp-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sp-navigate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 30, 140, 0.4);
+}

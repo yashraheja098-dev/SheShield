@@ -13,6 +13,8 @@ const useSafetyStore = create((set) => ({
   lastHeatMapUpdate:    null,
   isLoadingHeatMap:     false,
   isLoadingSafePoints:  false,
+  isHeatmapVisible:     true,
+  isSafePointsVisible:  true,
 
   /* ── Heat Map ── */
   setHeatMapData: (data) =>
@@ -22,6 +24,10 @@ const useSafetyStore = create((set) => ({
   /* ── Safe Points ── */
   setSafePoints:       (points) => set({ safePoints: points, isLoadingSafePoints: false }),
   setLoadingSafePoints:(v)      => set({ isLoadingSafePoints: v }),
+
+  /* ── Layer Toggles ── */
+  toggleHeatmap: () => set((s) => ({ isHeatmapVisible: !s.isHeatmapVisible })),
+  toggleSafePoints: () => set((s) => ({ isSafePointsVisible: !s.isSafePointsVisible })),
 
   /* ── Filter ── */
   setFilter: (filter) => set({ activeFilter: filter }),

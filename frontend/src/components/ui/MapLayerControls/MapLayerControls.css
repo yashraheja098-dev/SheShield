@@ -1,0 +1,42 @@
+.map-layer-controls {
+  position: absolute;
+  top: 80px; /* Below search bar */
+  right: var(--sp-4);
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-full);
+  padding: var(--sp-2) 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.layer-control-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  padding: var(--sp-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.layer-control-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.layer-control-btn.active {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 8px rgba(233, 30, 140, 0.4));
+}
+
+.layer-control-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 0 var(--sp-3);
+}
