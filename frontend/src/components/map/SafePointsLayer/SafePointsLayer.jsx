@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Marker, Popup } from 'react-leaflet';
+import { useMemo, useCallback } from 'react';
+import { Marker, Popup, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { Shield, Navigation } from 'lucide-react';
@@ -32,10 +32,11 @@ const createCustomIcon = (type) => {
 };
 
 const SafePointsLayer = () => {
+  const map = useMap();
   const safePoints = useSafetyStore((s) => s.safePoints);
   const isSafePointsVisible = useSafetyStore((s) => s.isSafePointsVisible);
   const activeFilter = useSafetyStore((s) => s.activeFilter);
-  
+
   const setDestination = useRouteStore((s) => s.setDestination);
   const setOrigin = useRouteStore((s) => s.setOrigin);
   const userPosition = useNavigationStore((s) => s.userPosition);
@@ -47,9 +48,9 @@ const SafePointsLayer = () => {
     return safePoints.filter(p => p.type === activeFilter);
   }, [safePoints, activeFilter]);
 
-  if (!isSafePointsVisible || !filteredPoints || filteredPoints.length === 0) return null;
+  const handleNavigate = useCallback((point) => {
+    map.closePopup();
 
-  const handleNavigate = (point) => {
     // Set origin to current user position
     if (userPosition) {
       setOrigin({
@@ -67,10 +68,12 @@ const SafePointsLayer = () => {
       lng: point.lng,
       type: 'safepoint'
     });
-    
+
     setAppMode(APP_MODES.PLANNING);
     setBottomSheet(SHEET_STATES.HALF);
-  };
+  }, [map, userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
+
+  if (!isSafePointsVisible || !filteredPoints || filteredPoints.length === 0) return null;
 
   return (
     <MarkerClusterGroup
@@ -84,22 +87,52 @@ const SafePointsLayer = () => {
           key={point.id}
           position={[point.lat, point.lng]}
           icon={createCustomIcon(point.type)}
+          eventHandlers={{
+            popupopen: (e) => {
+              // Record exactly when the popup was opened natively by Leaflet
+              e.popup._lastOpenTime = Date.now();
+            },
+            click: (e) => {
+              const marker = e.target;
+              const popup = marker.getPopup();
+              if (popup && popup.isOpen()) {
+                // Leaflet naturally opens the popup on marker click before firing this click event.
+                // We compare the current time with the open time.
+                // If it opened just a few milliseconds ago, this click was to OPEN it.
+                // If it opened long ago (> 200ms), this click was to CLOSE (toggle) it.
+                const wasJustOpened = (Date.now() - (popup._lastOpenTime || 0)) < 200;
+                if (!wasJustOpened) {
+                  marker.closePopup();
+                }
+              }
+            }
+          }}
         >
-          <Popup className="safe-point-popup">
+          <Popup 
+            className="safe-point-popup"
+            autoPanPadding={[50, 50]}
+            closeButton={true}
+          >
             <div className="safe-point-popup-content">
               <h3>{point.name}</h3>
               <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
               <p className="sp-distance">{point.distance}m away</p>
-              
-              <button 
+
+              <button
                 className="sp-navigate-btn"
-                onClick={(e) => {
+                onPointerUp={(e) => {
                   e.stopPropagation();
                   handleNavigate(point);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.stopPropagation();
+                    handleNavigate(point);
+                  }
+                }}
               >
                 <Navigation size={14} />
-                Navigate
+                Start Navigation
               </button>
             </div>
           </Popup>
