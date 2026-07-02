@@ -89,7 +89,7 @@
 /* ══ Layer 3: SOS FAB ══ */
 .layer--sos {
   right: var(--sp-4);
-  bottom: 140px;  /* just above bottom sheet */
+  bottom: 115px;  /* just above bottom sheet */
   z-index: var(--z-sos);
   pointer-events: all;
   animation: anim-scale-in-spring 0.5s 0.4s both;
@@ -121,7 +121,7 @@
 
   .layer--sos {
     right: var(--sp-6);
-    bottom: 160px;
+    bottom: 135px;
   }
 
   .layer--bottom {

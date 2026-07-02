@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Crosshair } from 'lucide-react';
+import { Search, X, Crosshair, ArrowUpDown } from 'lucide-react';
 import useUiStore from '../../../stores/uiStore';
 import useRouteStore from '../../../stores/routeStore';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -10,83 +10,145 @@ import SearchSuggestions from '../SearchSuggestions/SearchSuggestions';
 import './SearchBar.css';
 
 const SearchBar = () => {
-  const [query,   setQuery]   = useState('');
-  const [focused, setFocused] = useState(false);
+  const [pickupQuery, setPickupQuery] = useState('');
+  const [destQuery, setDestQuery] = useState('');
+  
+  const [focusedField, setFocusedField] = useState(null); // 'pickup' | 'dest' | null
+  const [hasUserEditedPickup, setHasUserEditedPickup] = useState(false);
+
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedPickup = useDebounce(pickupQuery, 300);
+  const debouncedDest = useDebounce(destQuery, 300);
 
   const setAppMode = useUiStore((s) => s.setAppMode);
   const setBottomSheet = useUiStore((s) => s.setBottomSheet);
   const appMode = useUiStore((s) => s.appMode);
+  
   const setDestination = useRouteStore((s) => s.setDestination);
   const setOrigin = useRouteStore((s) => s.setOrigin);
   const userPosition = useNavigationStore((s) => s.userPosition);
 
+  // Initialize Pickup Location
+  useEffect(() => {
+    if (hasUserEditedPickup) return;
+
+    if (!userPosition) {
+      setPickupQuery("Fetching current location...");
+    } else {
+      // Reverse geocode on initial mount or when GPS becomes available
+      geocodingApi.reverseGeocode(userPosition[0], userPosition[1]).then(res => {
+        if (!hasUserEditedPickup) {
+          setPickupQuery(res.name || 'Current Location');
+          setOrigin(res); // populate origin store initially
+        }
+      });
+    }
+  }, [userPosition, hasUserEditedPickup, setOrigin]);
+
+  // Fetch Suggestions
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (!debouncedQuery) {
+      const activeQuery = focusedField === 'pickup' ? debouncedPickup : debouncedDest;
+      
+      // Do not search if it's our default fetching string
+      if (!activeQuery || activeQuery === "Fetching current location..." || activeQuery === "Current Location") {
         setSuggestions([]);
         return;
       }
+      
       setIsLoading(true);
-      const results = await geocodingApi.searchPlaces(debouncedQuery, userPosition);
+      const results = await geocodingApi.searchPlaces(activeQuery, userPosition);
       setSuggestions(results);
       setIsLoading(false);
       setActiveIndex(-1);
     };
     
-    // Only search if we are in searching mode (not planning)
-    if (appMode !== APP_MODES.PLANNING) {
+    // Only fetch if searching mode and a field is focused
+    if (appMode !== APP_MODES.PLANNING && focusedField) {
       fetchSuggestions();
+    } else {
+      setSuggestions([]);
     }
-  }, [debouncedQuery, appMode, userPosition]);
+  }, [debouncedPickup, debouncedDest, focusedField, appMode, userPosition]);
 
   // Click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setFocused(false);
+        setFocusedField(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleFocus = () => {
-    setFocused(true);
+  const handleFocus = (field) => {
+    setFocusedField(field);
     if (appMode !== APP_MODES.PLANNING) {
       setAppMode(APP_MODES.SEARCHING);
     }
   };
 
-  const handleClear = () => {
-    setQuery('');
+  const handleClear = (field) => {
+    if (field === 'pickup') {
+      setPickupQuery('');
+      setHasUserEditedPickup(true);
+      // Wait, clearing pickup shouldn't necessarily cancel a route completely, 
+      // but the UI flow generally allows re-entering.
+    } else {
+      setDestQuery('');
+      setAppMode(APP_MODES.IDLE);
+      setBottomSheet(SHEET_STATES.PEEK);
+      useRouteStore.getState().clearRoute();
+    }
     setSuggestions([]);
-    setAppMode(APP_MODES.IDLE);
-    setBottomSheet(SHEET_STATES.PEEK);
-    useRouteStore.getState().clearRoute();
+  };
+
+  const handleSwap = () => {
+    // 1. Swap Text Strings
+    const tempPickup = pickupQuery;
+    setPickupQuery(destQuery);
+    setDestQuery(tempPickup);
+    setHasUserEditedPickup(true);
+
+    // 2. Swap Underlying Store Objects
+    // Reacts dynamically via RouteLayer when these change
+    const currentOrigin = useRouteStore.getState().origin;
+    const currentDestination = useRouteStore.getState().destination;
+    
+    if (currentOrigin || currentDestination) {
+      setOrigin(currentDestination || null);
+      setDestination(currentOrigin || null);
+    }
   };
 
   const handleSelect = (item) => {
-    setQuery(item.name);
-    setFocused(false);
-    
-    // Set origin to current user position
-    if (userPosition) {
-      setOrigin({
-        lat: userPosition[0],
-        lng: userPosition[1],
-        name: 'My Location'
-      });
-    }
+    if (focusedField === 'pickup') {
+      setPickupQuery(item.name);
+      setHasUserEditedPickup(true);
+      setOrigin(item);
+      setFocusedField('dest'); // Automatically focus dest next
+    } else {
+      setDestQuery(item.name);
+      setFocusedField(null);
+      
+      // Ensure origin is set to userPosition fallback if user didn't edit pickup but somehow the origin store is empty
+      if (!hasUserEditedPickup && userPosition) {
+         setOrigin({
+           lat: userPosition[0],
+           lng: userPosition[1],
+           name: 'My Location'
+         });
+      }
 
-    setDestination(item);
-    setAppMode(APP_MODES.PLANNING);
-    setBottomSheet(SHEET_STATES.HALF);
+      setDestination(item);
+      setAppMode(APP_MODES.PLANNING);
+      setBottomSheet(SHEET_STATES.HALF);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -106,61 +168,92 @@ const SearchBar = () => {
         handleSelect(suggestions[0]);
       }
     } else if (e.key === 'Escape') {
-      setFocused(false);
+      setFocusedField(null);
     }
   };
 
-  const showDropdown = focused && (suggestions.length > 0 || isLoading);
+  const showDropdown = focusedField && (suggestions.length > 0 || isLoading);
 
   return (
     <div className="search-bar-container" ref={wrapperRef} style={{ position: 'relative' }}>
-      <div className={`search-bar-wrapper ${focused ? 'focused' : ''}`}>
-        {/* ── Search Icon ── */}
-        <span className="search-icon" aria-hidden="true">
-          <Search size={18} strokeWidth={2.2} />
-        </span>
-
-        {/* ── Input ── */}
-        <input
-          id="she-search-input"
-          type="text"
-          className="search-input"
-          placeholder="Where do you want to go?"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            if (appMode === APP_MODES.PLANNING) setAppMode(APP_MODES.SEARCHING);
-          }}
-          onFocus={handleFocus}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-          spellCheck={false}
-          aria-label="Search destination"
-        />
-
-        {/* ── Clear Button (visible when query exists) ── */}
-        {query && (
-          <button
-            className="search-clear-btn"
-            onClick={handleClear}
-            aria-label="Clear search"
-            tabIndex={0}
-          >
-            <X size={15} strokeWidth={2.5} />
-          </button>
-        )}
+      <div className={`search-panel-wrapper ${focusedField ? 'focused' : ''}`}>
+        
+        {/* ── Pickup Row ── */}
+        <div className={`search-row ${focusedField === 'pickup' ? 'active-row' : ''}`}>
+          <span className="search-icon" aria-hidden="true">
+            <Crosshair size={18} strokeWidth={2.2} />
+          </span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Pickup Location"
+            value={pickupQuery}
+            onChange={(e) => {
+              setPickupQuery(e.target.value);
+              setHasUserEditedPickup(true);
+              if (appMode === APP_MODES.PLANNING) setAppMode(APP_MODES.SEARCHING);
+            }}
+            onFocus={() => handleFocus('pickup')}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          {pickupQuery && focusedField === 'pickup' && (
+            <button
+              className="search-clear-btn"
+              onClick={() => handleClear('pickup')}
+              aria-label="Clear pickup"
+              tabIndex={0}
+            >
+              <X size={15} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
 
         {/* ── Divider ── */}
-        <span className="search-divider" aria-hidden="true" />
-
-        {/* ── Locate Button ── */}
-        <button
-          className="search-locate-btn"
-          aria-label="Use my location"
-          tabIndex={0}
+        <div className="search-divider-horizontal" />
+        
+        {/* ── SWAP BUTTON ── */}
+        <button 
+          className="search-swap-btn" 
+          onClick={handleSwap} 
+          aria-label="Swap pickup and destination"
+          title="Swap locations"
         >
-          <Crosshair size={18} strokeWidth={2} />
+          <ArrowUpDown size={16} strokeWidth={2} />
         </button>
+
+        {/* ── Destination Row ── */}
+        <div className={`search-row ${focusedField === 'dest' ? 'active-row' : ''}`}>
+          <span className="search-icon" aria-hidden="true">
+            <Search size={18} strokeWidth={2.2} />
+          </span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Where do you want to go?"
+            value={destQuery}
+            onChange={(e) => {
+              setDestQuery(e.target.value);
+              if (appMode === APP_MODES.PLANNING) setAppMode(APP_MODES.SEARCHING);
+            }}
+            onFocus={() => handleFocus('dest')}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          {destQuery && focusedField === 'dest' && (
+            <button
+              className="search-clear-btn"
+              onClick={() => handleClear('dest')}
+              aria-label="Clear destination"
+              tabIndex={0}
+            >
+              <X size={15} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
+
       </div>
 
       {showDropdown && (
