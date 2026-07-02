@@ -12,13 +12,13 @@ const LoginScreen = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     if (email && password) {
-      navigate('/map');
+      navigate('/location');
     }
   };
 
   const handleGuest = (e) => {
     e.preventDefault();
-    navigate('/map');
+    navigate('/location');
   };
 
   return (

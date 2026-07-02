@@ -6,6 +6,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SplashScreen from './components/screens/SplashScreen/SplashScreen';
 import LoginScreen from './components/screens/LoginScreen/LoginScreen';
+import LocationPermissionScreen from './components/screens/LocationPermissionScreen/LocationPermissionScreen';
 import MapShell from './components/layout/MapShell/MapShell';
 
 function App() {
@@ -15,8 +16,11 @@ function App() {
         {/* Entry point: Splash Screen */}
         <Route path="/" element={<SplashScreen />} />
         
-        {/* Placeholder for Authentication */}
+        {/* Authentication */}
         <Route path="/login" element={<LoginScreen />} />
+        
+        {/* Location Permission Screen */}
+        <Route path="/location" element={<LocationPermissionScreen />} />
         
         {/* Main Application Shell */}
         <Route path="/map" element={<MapShell />} />
