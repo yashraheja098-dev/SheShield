@@ -9,7 +9,7 @@ const AlertModal = () => {
   
   const [showToast, setShowToast] = useState(false);
 
-  if (!isModalVisible) return null;
+  if (!isModalVisible && !showToast) return null;
 
   const handleReturn = () => {
     hideModal();
@@ -28,7 +28,8 @@ const AlertModal = () => {
 
   return (
     <>
-      <div className="alert-modal-overlay">
+      {isModalVisible && (
+        <div className="alert-modal-overlay">
         <div className="alert-modal-card">
           <div className="alert-modal-icon">
             <AlertTriangle size={32} strokeWidth={2.5} />
@@ -54,6 +55,7 @@ const AlertModal = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Simulated Toast for Hackathon Demo */}
       {showToast && (
