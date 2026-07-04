@@ -3,6 +3,7 @@ import { getTimeSlot, getTimeSafetyLevel } from '../../../utils/timeOfDay';
 import useUiStore from '../../../stores/uiStore';
 import { APP_MODES } from '../../../constants/appConstants';
 import RouteCards from '../../route/RouteCards/RouteCards';
+import ActiveJourneyPanel from '../../route/ActiveJourneyPanel/ActiveJourneyPanel';
 import './BottomSheet.css';
 
 /* ── Time of Day Safety Badge ── */
@@ -76,6 +77,8 @@ const BottomSheet = ({ children }) => {
       <div className="bs-content">
         {appMode === APP_MODES.PLANNING ? (
           <RouteCards />
+        ) : appMode === APP_MODES.NAVIGATING ? (
+          <ActiveJourneyPanel />
         ) : (
           children ?? <EmptyState />
         )}

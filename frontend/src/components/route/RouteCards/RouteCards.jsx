@@ -1,9 +1,11 @@
 import { formatDistance, formatDuration } from '../../../utils/formatters';
 import useRouteStore from '../../../stores/routeStore';
+import useUiStore from '../../../stores/uiStore';
+import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
 import './RouteCards.css';
 
-const RouteCard = ({ route, isActive, onClick }) => {
+const RouteCard = ({ route, isActive, onClick, onStartNavigation }) => {
   const isSafe = route.safetyScore >= 80;
   const isWarning = route.safetyScore >= 60 && route.safetyScore < 80;
   
@@ -46,7 +48,13 @@ const RouteCard = ({ route, isActive, onClick }) => {
       </div>
       
       {isActive && (
-        <button className="route-start-btn">
+        <button 
+          className="route-start-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onStartNavigation) onStartNavigation();
+          }}
+        >
           Start Navigation
         </button>
       )}
@@ -60,6 +68,9 @@ const RouteCards = () => {
   const setActiveRoute = useRouteStore((s) => s.setActiveRoute);
   const isLoading = useRouteStore((s) => s.isLoading);
   const error = useRouteStore((s) => s.error);
+
+  const setAppMode = useUiStore((s) => s.setAppMode);
+  const setBottomSheet = useUiStore((s) => s.setBottomSheet);
 
   if (isLoading) {
     return (
@@ -88,6 +99,10 @@ const RouteCards = () => {
           route={route}
           isActive={index === activeRouteIndex}
           onClick={() => setActiveRoute(index)}
+          onStartNavigation={() => {
+            setAppMode(APP_MODES.NAVIGATING);
+            setBottomSheet(SHEET_STATES.HIDDEN);
+          }}
         />
       ))}
     </div>

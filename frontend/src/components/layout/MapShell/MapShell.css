@@ -89,10 +89,26 @@
 /* ══ Layer 3: SOS FAB ══ */
 .layer--sos {
   right: var(--sp-4);
-  bottom: 140px;  /* just above bottom sheet */
+  bottom: 115px;  /* just above bottom sheet */
   z-index: var(--z-sos);
   pointer-events: all;
   animation: anim-scale-in-spring 0.5s 0.4s both;
+}
+
+/* ══ Layer 2.5: Alert Mode ══ */
+.layer--alert {
+  right: var(--sp-4);
+  bottom: 520px;  /* above zoom controls */
+  z-index: 900;
+  pointer-events: all;
+}
+
+/* ══ Layer 2.8: Report Incident ══ */
+.layer--report {
+  right: var(--sp-4);
+  bottom: 580px;  /* above alert mode */
+  z-index: 910;
+  pointer-events: all;
 }
 
 /* ══ Layer 4: Bottom Sheet ══ */
@@ -118,10 +134,20 @@
     right: var(--sp-6);
     bottom: 240px;
   }
+  
+  .layer--alert {
+    right: var(--sp-6);
+    bottom: 540px;
+  }
+
+  .layer--report {
+    right: var(--sp-6);
+    bottom: 600px;
+  }
 
   .layer--sos {
     right: var(--sp-6);
-    bottom: 160px;
+    bottom: 135px;
   }
 
   .layer--bottom {

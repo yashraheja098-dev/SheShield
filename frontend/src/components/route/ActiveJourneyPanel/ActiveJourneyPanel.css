@@ -1,0 +1,169 @@
+/* ══════════════════════════════════════
+   ActiveJourneyPanel Styles (Refined)
+   ══════════════════════════════════════ */
+
+.active-journey-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0;
+  animation: fade-in var(--transition-base) forwards;
+}
+
+/* ── Top Row (Status & Title) ── */
+.journey-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-1);
+}
+
+.journey-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.journey-pulsing-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-success);
+  border-radius: 50%;
+  animation: pulse-success 2s infinite ease-in-out;
+}
+
+.journey-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* ── Destination Block ── */
+.journey-dest-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.journey-dest-name {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.journey-dest-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Inline Metrics ── */
+.journey-metrics-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.journey-metric-text {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.journey-metric-dot {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+/* ── Safety Status Badges ── */
+.journey-status-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.journey-status-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+
+/* Reuse existing route styling tokens where possible */
+.status-safe {
+  color: var(--color-safe);
+  background: var(--color-safe-alpha);
+}
+
+.status-caution {
+  color: var(--color-caution);
+  background: var(--color-caution-alpha);
+}
+
+.status-danger {
+  color: var(--color-danger);
+  background: var(--color-danger-alpha);
+}
+
+.status-alert-mode {
+  color: var(--color-primary);
+  background: rgba(233, 30, 140, 0.1);
+  border: 1px solid rgba(233, 30, 140, 0.2);
+}
+
+.status-deviated {
+  color: white;
+  background: var(--color-danger);
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
+  animation: pulse-danger 2s infinite;
+}
+
+/* ── Divider ── */
+.journey-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: var(--sp-1) 0;
+}
+
+/* ── Action ── */
+.journey-end-btn {
+  width: 100%;
+  padding: var(--sp-2);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-danger);
+  background: transparent;
+  border: 1px solid var(--color-danger-alpha);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.journey-end-btn:hover {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: rgba(244, 67, 54, 0.3);
+}
+
+/* ── Animations ── */
+@keyframes pulse-success {
+  0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+
+@keyframes pulse-danger {
+  0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(244, 67, 54, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+}

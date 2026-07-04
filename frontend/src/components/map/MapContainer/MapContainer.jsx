@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer as LeafletMapContainer, TileLayer, useMap } from 'react-leaflet';
 import useMapStore        from '../../../stores/mapStore';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -21,13 +21,15 @@ const MapController = () => {
     return () => setMapInstance(null);
   }, [map, setMapInstance]);
 
+  const hasCentered = useRef(false);
+
   /* Fly to user position once on first resolve */
   useEffect(() => {
-    if (userPosition) {
+    if (userPosition && !hasCentered.current) {
       map.flyTo(userPosition, NAVIGATION_ZOOM, { animate: true, duration: 1.4 });
+      hasCentered.current = true;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentional: only run once on first mount with position
+  }, [userPosition, map]);
 
   return null;
 };

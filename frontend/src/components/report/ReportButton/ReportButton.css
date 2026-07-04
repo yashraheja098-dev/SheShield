@@ -1,0 +1,56 @@
+.report-incident-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 48px;
+  height: 48px;
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-full);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  animation: scale-in-spring 0.4s both;
+}
+
+.report-incident-btn:hover {
+  background: var(--color-surface-raised);
+  transform: translateY(-2px);
+  border-color: rgba(255, 152, 0, 0.4);
+}
+
+.report-incident-btn:active {
+  transform: translateY(1px);
+}
+
+.report-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff9800; /* Warning orange color for report */
+}
+
+@media (min-width: 768px) {
+  .report-incident-btn {
+    width: auto;
+    padding: 0 16px;
+    height: 44px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+  
+  .report-label {
+    display: block;
+  }
+}
+
+/* Hide text label on mobile, keep it square */
+@media (max-width: 767px) {
+  .report-label {
+    display: none;
+  }
+}
