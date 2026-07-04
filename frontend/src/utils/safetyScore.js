@@ -1,10 +1,12 @@
 import { getTimeSlot } from './timeOfDay';
+import { closestPointOnRoute } from './geoUtils';
 
 /**
  * Deterministic mock safety score calculation for Phase 2.
  * Based on distance, time of day, route index, and simple coordinate hashing.
+ * Based on distance, time of day, route index, community reports, and simple coordinate hashing.
  */
-export const calculateSafetyScore = (distance, index, geometry) => {
+export const calculateSafetyScore = (distance, index, geometry, reports = []) => {
   const timeSlot = getTimeSlot();
   
   // Base score 0-100
@@ -34,14 +36,35 @@ export const calculateSafetyScore = (distance, index, geometry) => {
     score -= 10;
   }
   
-  // Clamp between 0 and 100
+  // Clamp base score between 0 and 100 before report deductions
   score = Math.max(0, Math.min(100, score));
   
-  // Generate warnings based on score and time
+  // 5. Community Reports Impact
+  let nearbyReportsCount = 0;
+  if (reports && reports.length > 0 && geometry && geometry.length > 0) {
+    reports.forEach(report => {
+      if (report.position && report.position.length >= 2) {
+        // closestPointOnRoute returns distance in meters
+        const { distance: distToReport } = closestPointOnRoute(report.position, geometry);
+        if (distToReport < 100) { // 100 meters threshold
+          nearbyReportsCount++;
+          score -= 10;
+        }
+      }
+    });
+  }
+
+  // Final Clamp
+  score = Math.max(0, Math.min(100, score));
+  
+  // Generate warnings based on score, time, and reports
   const warnings = [];
+  if (nearbyReportsCount > 0) {
+    warnings.push(`Passes near ${nearbyReportsCount} community report${nearbyReportsCount > 1 ? 's' : ''}`);
+  }
   if (score < 60) warnings.push('Isolated stretch detected');
   if (timeSlot.id === 'night' && score < 80) warnings.push('Passes through low-lit area');
-  if (index === 1) warnings.push('Higher traffic speed area');
+  if (index === 1 && nearbyReportsCount === 0) warnings.push('Higher traffic speed area');
 
   return { score, warnings };
 };

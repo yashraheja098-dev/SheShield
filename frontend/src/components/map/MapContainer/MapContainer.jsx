@@ -7,6 +7,7 @@ import UserLocationPin from '../UserLocationPin/UserLocationPin';
 import RouteLayer from '../RouteLayer/RouteLayer';
 import HeatmapLayer from '../HeatmapLayer/HeatmapLayer';
 import SafePointsLayer from '../SafePointsLayer/SafePointsLayer';
+import CommunityIncidentsLayer from '../CommunityIncidentsLayer/CommunityIncidentsLayer';
 import './MapContainer.css';
 
 /* ── Inner: registers the map instance in Zustand ── */
@@ -62,6 +63,8 @@ const MapContainer = () => {
         <RouteLayer />
         
         <SafePointsLayer />
+
+        <CommunityIncidentsLayer />
 
         <UserLocationPin position={userPosition} />
       </LeafletMapContainer>

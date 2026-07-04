@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, ShieldAlert } from 'lucide-react';
 import useAlertStore from '../../../stores/alertStore';
+import SafePointSuggestions from '../../safety/SafePointSuggestions/SafePointSuggestions';
 import './AlertModal.css';
 
 const AlertModal = () => {
@@ -41,6 +42,9 @@ const AlertModal = () => {
           <p className="alert-modal-message">
             Would you like to return to the recommended route?
           </p>
+
+          {/* Smart nearby safe point suggestions */}
+          <SafePointSuggestions maxItems={3} />
 
           <div className="alert-modal-actions">
             <button className="alert-btn alert-btn-return" onClick={handleReturn}>

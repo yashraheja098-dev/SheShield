@@ -64,8 +64,7 @@ const SOSActiveScreen = ({ onResolve }) => (
       </div>
       <h2 className="sos-active-title">SOS Activated</h2>
       <p className="sos-active-subtitle">
-        Your location is being shared with your trusted contacts.
-        Help is on the way.
+        Emergency mode is active. Stay calm — press Call 112 to reach emergency services directly.
       </p>
 
       <div className="sos-active-number">

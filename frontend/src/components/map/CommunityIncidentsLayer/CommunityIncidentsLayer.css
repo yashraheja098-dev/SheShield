@@ -1,0 +1,200 @@
+/* ══════════════════════════════════════
+   CommunityIncidentsLayer Styles
+   ══════════════════════════════════════ */
+
+/* ── Custom Marker ── */
+.incident-point-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(20, 20, 25, 0.85); /* dark inner background */
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+  box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+  transition: transform var(--transition-fast);
+}
+
+.marker-Harassment {
+  border-color: #ff7043; /* coral */
+  color: #ff7043;
+  box-shadow: 0 0 5px rgba(255, 112, 67, 0.3);
+}
+
+.marker-Stalking {
+  border-color: #f44336; /* red */
+  color: #f44336;
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
+}
+
+.marker-Unsafe.Area {
+  border-color: #ff9800; /* orange */
+  color: #ff9800;
+  box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+}
+
+.marker-Poor.Lighting {
+  border-color: #ffc107; /* amber */
+  color: #ffc107;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+}
+
+.marker-Other, .marker-Grouped {
+  border-color: #ffb74d; /* light orange */
+  color: #ffb74d;
+  box-shadow: 0 0 5px rgba(255, 183, 77, 0.3);
+}
+
+.incident-point-marker {
+  position: relative;
+}
+
+.incident-group-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--color-danger);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border: 1px solid var(--glass-border);
+}
+
+.incident-point-marker:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px currentColor;
+  z-index: 1000;
+}
+
+/* ── Popup Design ── */
+.incident-popup .leaflet-popup-content-wrapper {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  padding: 0;
+  overflow: hidden;
+}
+
+.incident-popup .leaflet-popup-tip {
+  background: var(--glass-bg-heavy);
+  border: 1px solid var(--glass-border-strong);
+  backdrop-filter: var(--glass-blur-heavy);
+}
+
+.incident-popup .leaflet-popup-close-button {
+  color: var(--color-text-secondary) !important;
+  font-size: 16px !important;
+  top: 8px !important;
+  right: 8px !important;
+}
+
+.incident-popup .leaflet-popup-close-button:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* ── Popup Content ── */
+.incident-popup-content {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 200px;
+}
+
+.incident-popup-label {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  background: rgba(255, 152, 0, 0.15);
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  margin-bottom: var(--sp-1);
+}
+
+.incident-popup-content h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.incident-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.incident-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  margin-top: var(--sp-1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Grouped Popup Extras ── */
+.grouped-popup-content {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for popup */
+.grouped-popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+.grouped-popup-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.grouped-popup-content::-webkit-scrollbar-thumb {
+  background: var(--glass-border-strong);
+  border-radius: var(--r-full);
+}
+
+.grouped-reports-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.grouped-report-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.grouped-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.grouped-report-header .incident-time {
+  margin-top: 0;
+}
+
+.grouped-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: var(--sp-2) 0;
+}

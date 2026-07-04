@@ -1,4 +1,5 @@
 import { calculateSafetyScore } from '../../utils/safetyScore';
+import useReportStore from '../../stores/reportStore';
 
 export const routingApi = {
   /**
@@ -28,8 +29,11 @@ export const routingApi = {
         // Leaflet Polyline expects array of [lat, lon].
         const geometry = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
         
-        // Use deterministic mock logic for safety score
-        const { score, warnings } = calculateSafetyScore(distance, index, geometry);
+        // Fetch real-time community reports from Zustand
+        const reports = useReportStore.getState().reports || [];
+
+        // Use deterministic mock logic for safety score, now strictly augmented by real community reports
+        const { score, warnings } = calculateSafetyScore(distance, index, geometry, reports);
         
         return {
           id: `route_${index}`,

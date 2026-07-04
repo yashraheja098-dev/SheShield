@@ -1,21 +1,39 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.heat';
 import useSafetyStore from '../../../stores/safetyStore';
+import useReportStore from '../../../stores/reportStore';
 
 const HeatmapLayer = () => {
   const map = useMap();
   const heatMapData = useSafetyStore((s) => s.heatMapData);
   const isHeatmapVisible = useSafetyStore((s) => s.isHeatmapVisible);
   const timeSlot = useSafetyStore((s) => s.timeSlot);
+  const reports = useReportStore((s) => s.reports);
   
   const heatLayerRef = useRef(null);
+
+  // Combine external mock API heatmap data with local community reports
+  const combinedHeatMapData = useMemo(() => {
+    const combined = [...(heatMapData || [])];
+    
+    if (reports && reports.length > 0) {
+      reports.forEach(report => {
+        if (report.position && report.position.length >= 2) {
+          // [lat, lng, intensity]
+          combined.push([report.position[0], report.position[1], 0.6]);
+        }
+      });
+    }
+    
+    return combined;
+  }, [heatMapData, reports]);
 
   useEffect(() => {
     if (!map) return;
 
-    if (!isHeatmapVisible || !heatMapData || heatMapData.length === 0) {
+    if (!isHeatmapVisible || combinedHeatMapData.length === 0) {
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
         heatLayerRef.current = null;
@@ -37,28 +55,25 @@ const HeatmapLayer = () => {
       1.0: 'red'
     };
 
-    if (!heatLayerRef.current) {
-      heatLayerRef.current = L.heatLayer(heatMapData, {
-        radius,
-        blur,
-        maxZoom: 15,
-        gradient,
-        minOpacity: 0.3
-      }).addTo(map);
-    } else {
-      heatLayerRef.current.setLatLngs(heatMapData);
-      heatLayerRef.current.setOptions({ radius, blur, gradient });
-      if (!map.hasLayer(heatLayerRef.current)) {
-        heatLayerRef.current.addTo(map);
-      }
+    if (heatLayerRef.current) {
+      map.removeLayer(heatLayerRef.current);
     }
 
+    heatLayerRef.current = L.heatLayer(combinedHeatMapData, {
+      radius,
+      blur,
+      maxZoom: 15,
+      gradient,
+      minOpacity: 0.3
+    }).addTo(map);
+
     return () => {
-      if (heatLayerRef.current && map.hasLayer(heatLayerRef.current)) {
+      if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
+        heatLayerRef.current = null;
       }
     };
-  }, [map, heatMapData, isHeatmapVisible, timeSlot]);
+  }, [map, combinedHeatMapData, isHeatmapVisible, timeSlot]);
 
   return null; // Heatmap does not render React children
 };

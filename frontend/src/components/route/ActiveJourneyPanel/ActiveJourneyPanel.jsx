@@ -1,11 +1,14 @@
-import React from 'react';
-import { ShieldCheck, ShieldAlert, Shield, AlertTriangle, Activity } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ShieldCheck, ShieldAlert, Shield, AlertTriangle, Activity, MapPin } from 'lucide-react';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import useAlertStore from '../../../stores/alertStore';
 import useNavigationStore from '../../../stores/navigationStore';
+import useSafetyStore from '../../../stores/safetyStore';
+import useMapStore from '../../../stores/mapStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { formatDistance, formatDuration } from '../../../utils/formatters';
+import { rankSafePointsForRoute } from '../../../utils/safePointRanking';
 import './ActiveJourneyPanel.css';
 
 const ActiveJourneyPanel = () => {
@@ -25,10 +28,26 @@ const ActiveJourneyPanel = () => {
   const stopNavigation = useNavigationStore((s) => s.stopNavigation);
   const remainingDistance = useNavigationStore((s) => s.remainingDistance);
   const remainingTime = useNavigationStore((s) => s.remainingTime);
+  const hasDeviated = useNavigationStore((s) => s.hasDeviated);
+
+  const safePoints = useSafetyStore((s) => s.safePoints);
+  const userPosition = useNavigationStore((s) => s.userPosition);
+  const flyTo = useMapStore((s) => s.flyTo);
+
+  const [showSafePtFlash, setShowSafePtFlash] = useState(false);
 
   const activeRoute = routes[activeRouteIndex];
-  
+
   if (!activeRoute) return null;
+
+  // Active route geometry for corridor-aware safe point selection
+  const routeGeometry = activeRoute?.geometry ?? null;
+
+  // Route-aware nearest safe point (shared utility — same logic as SafePointSuggestions)
+  const nearestSafePoint = useMemo(
+    () => rankSafePointsForRoute(safePoints, routeGeometry, userPosition, 1)[0] ?? null,
+    [safePoints, routeGeometry, userPosition]
+  );
 
   // Derive distance and time. Fallback to route total if navigationStore hasn't updated yet.
   const displayDistance = remainingDistance || activeRoute.distance;
@@ -67,7 +86,8 @@ const ActiveJourneyPanel = () => {
         </div>
         
         <div className="journey-status-badges">
-          {isModalVisible ? (
+          {/* Deviation badge: use navigationStore.hasDeviated OR alertStore modal as fallback */}
+          {(hasDeviated || isModalVisible) ? (
             <div className="journey-status-pill status-deviated">
               <AlertTriangle size={14} />
               <span>Deviated</span>
@@ -102,7 +122,23 @@ const ActiveJourneyPanel = () => {
 
       <div className="journey-divider" />
 
-      {/* ── Action ── */}
+      {/* ── Find Nearest Safe Point ── */}
+      {nearestSafePoint && (
+        <button
+          className="journey-safepoint-btn"
+          onClick={() => {
+            flyTo([nearestSafePoint.lat, nearestSafePoint.lng], 16);
+            setShowSafePtFlash(true);
+            setTimeout(() => setShowSafePtFlash(false), 2000);
+          }}
+          aria-label="Fly to nearest safe point on map"
+        >
+          <MapPin size={14} />
+          {showSafePtFlash ? 'Showing on map…' : 'Find Nearby Safe Point'}
+        </button>
+      )}
+
+      {/* ── End Journey ── */}
       <button className="journey-end-btn" onClick={handleEndJourney}>
         End Journey
       </button>

@@ -19,6 +19,7 @@ import AlertMode       from '../../alert/AlertMode/AlertMode';
 import AlertModal      from '../../alert/AlertModal/AlertModal';
 import ReportButton    from '../../report/ReportButton/ReportButton';
 import ReportModal     from '../../report/ReportModal/ReportModal';
+import LiveReportsFeed from '../../report/LiveReportsFeed/LiveReportsFeed';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -91,6 +92,9 @@ const MapShell = () => {
 
           {/* Search */}
           <SearchBar />
+          
+          {/* ── Live Reports Feed ── */}
+          <LiveReportsFeed />
         </div>
       </div>
 
