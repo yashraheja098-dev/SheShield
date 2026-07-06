@@ -27,6 +27,17 @@ const useUserStore = create((set, get) => ({
   profile:         load(STORAGE_KEYS.USER_PROFILE, null),
   trustedContacts: load(STORAGE_KEYS.TRUSTED_CONTACTS, []),
   isOnboarded:     !!localStorage.getItem(STORAGE_KEYS.ONBOARDED),
+  token:           localStorage.getItem('ss_auth_token') || null,
+
+  /* ── Token ── */
+  setToken: (token) => {
+    localStorage.setItem('ss_auth_token', token);
+    set({ token });
+  },
+  clearToken: () => {
+    localStorage.removeItem('ss_auth_token');
+    set({ token: null, profile: null });
+  },
 
   /* ── Profile ── */
   setProfile: (profile) => {

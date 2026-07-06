@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Eye, EyeOff } from 'lucide-react';
+import axiosInstance from '../../../services/api/axiosInstance';
+import useUserStore from '../../../stores/userStore';
 import './LoginScreen.css';
 
 const LoginScreen = () => {
@@ -8,11 +10,25 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const setToken = useUserStore((s) => s.setToken);
+  const setProfile = useUserStore((s) => s.setProfile);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email && password) {
+    if (!email || !password) return;
+    setError('');
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.post('/auth/login', { email, password });
+      setToken(res.data.token);
+      setProfile(res.data.user);
       navigate('/location');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -20,6 +36,7 @@ const LoginScreen = () => {
     e.preventDefault();
     navigate('/location');
   };
+
 
   return (
     <div className="login-container">
@@ -80,9 +97,15 @@ const LoginScreen = () => {
             <button type="button" className="login-link">Forgot Password?</button>
           </div>
 
+          {error && (
+            <p style={{ color: 'var(--color-danger, #ff4d4d)', fontSize: '0.8rem', marginBottom: '0.5rem', textAlign: 'center' }}>
+              {error}
+            </p>
+          )}
+
           <div className="login-actions">
-            <button type="submit" className="login-btn-primary">
-              Login
+            <button type="submit" className="login-btn-primary" disabled={isLoading}>
+              {isLoading ? 'Signing in…' : 'Login'}
             </button>
             <button type="button" className="login-btn-secondary" onClick={handleGuest}>
               Continue as Guest

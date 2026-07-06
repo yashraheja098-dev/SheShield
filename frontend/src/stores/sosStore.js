@@ -15,6 +15,7 @@ const useSosStore = create((set, get) => ({
   countdown:        5,
   contactsAlerted:  [],
   triggeredAt:      null,
+  activeSosId:      null,   /* backend SOSLog._id — stored for resolve call */
   _timerId:         null,   /* internal — do not read directly */
 
   /* ── Begin countdown (5 → 0, then auto-trigger) ── */
@@ -51,6 +52,9 @@ const useSosStore = create((set, get) => ({
   /* ── Mark contacts as alerted ── */
   alertContacts: (contacts) => set({ contactsAlerted: contacts }),
 
+  /* ── Store SOS log ID returned from backend ── */
+  setActiveSosId: (id) => set({ activeSosId: id }),
+
   /* ── User resolves the emergency ── */
   resolveEmergency: () => {
     const { _timerId } = get();
@@ -61,6 +65,7 @@ const useSosStore = create((set, get) => ({
       countdown:       5,
       contactsAlerted: [],
       triggeredAt:     null,
+      activeSosId:     null,
       _timerId:        null,
     });
   },

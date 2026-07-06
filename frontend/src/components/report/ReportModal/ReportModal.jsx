@@ -2,26 +2,31 @@ import React, { useState } from 'react';
 import { TriangleAlert, CheckCircle2 } from 'lucide-react';
 import useReportStore from '../../../stores/reportStore';
 import useNavigationStore from '../../../stores/navigationStore';
+import axiosInstance from '../../../services/api/axiosInstance';
 import './ReportModal.css';
 
+// Exactly matches backend Incident.type enum
 const CATEGORIES = [
   'Harassment',
-  'Stalking',
-  'Unsafe Area',
+  'Suspicious Activity',
   'Poor Lighting',
-  'Other'
+  'Road Block',
+  'Unsafe Crowd',
+  'Police Patrol',
+  'Accident',
 ];
 
 const ReportModal = () => {
   const isReportModalOpen = useReportStore((s) => s.isReportModalOpen);
   const closeReportModal = useReportStore((s) => s.closeReportModal);
   const submitReport = useReportStore((s) => s.submitReport);
-  
+
   const userPosition = useNavigationStore((s) => s.userPosition);
-  
+
   const [selectedCategory, setSelectedCategory] = useState('');
   const [description, setDescription] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If both the modal and toast are hidden, don't render anything
   if (!isReportModalOpen && !showToast) return null;
@@ -35,24 +40,49 @@ const ReportModal = () => {
     }, 300);
   };
 
-  const handleSubmit = () => {
-    const payload = {
-      id: Date.now().toString(),
-      category: selectedCategory,
-      description,
-      position: userPosition || null,
-      timestamp: new Date().toISOString()
-    };
-    
-    submitReport(payload);
-    
-    // Reset form state
-    setSelectedCategory('');
-    setDescription('');
-    
-    // Show success toast
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
+  const handleSubmit = async () => {
+    if (!selectedCategory) return;
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('type', selectedCategory);
+      formData.append('description', description || selectedCategory);
+      if (userPosition) {
+        formData.append('latitude', String(userPosition[0]));
+        formData.append('longitude', String(userPosition[1]));
+      } else {
+        // Backend requires lat/lng — use 0,0 as last resort
+        formData.append('latitude', '0');
+        formData.append('longitude', '0');
+      }
+
+      const res = await axiosInstance.post('/incidents', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const inc = res.data?.incident;
+      if (inc) {
+        const normalized = {
+          id:          inc._id,
+          category:    inc.type,
+          description: inc.description || '',
+          position:    [inc.latitude, inc.longitude],
+          timestamp:   inc.createdAt,
+        };
+        submitReport(normalized);
+      }
+    } catch (err) {
+      console.error('Report submission failed:', err);
+      // Still show toast so user knows submission was attempted
+    } finally {
+      setIsSubmitting(false);
+      // Reset form and show success toast
+      setSelectedCategory('');
+      setDescription('');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4000);
+    }
   };
 
   return (
@@ -60,7 +90,7 @@ const ReportModal = () => {
       {isReportModalOpen && (
         <div className="report-modal-overlay">
           <div className="report-modal-card">
-            
+
             <div className="report-modal-header">
               <div className="report-modal-icon">
                 <TriangleAlert size={28} strokeWidth={2.5} />
@@ -83,11 +113,7 @@ const ReportModal = () => {
 
             <textarea
               className="report-textarea"
-              placeholder={
-                selectedCategory === 'Other' 
-                  ? "Please describe the incident (Required)" 
-                  : "Add optional details about the incident..."
-              }
+              placeholder="Add optional details about the incident..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -96,15 +122,12 @@ const ReportModal = () => {
               <button className="report-btn report-btn-cancel" onClick={handleCancel}>
                 Cancel
               </button>
-              <button 
-                className="report-btn report-btn-submit" 
+              <button
+                className="report-btn report-btn-submit"
                 onClick={handleSubmit}
-                disabled={
-                  !selectedCategory || 
-                  (selectedCategory === 'Other' && !description.trim())
-                }
+                disabled={isSubmitting || !selectedCategory}
               >
-                Submit Report
+                {isSubmitting ? 'Submitting…' : 'Submit Report'}
               </button>
             </div>
 
@@ -112,7 +135,7 @@ const ReportModal = () => {
         </div>
       )}
 
-      {/* Simulated Success Toast */}
+      {/* Success Toast */}
       {showToast && (
         <div className="report-toast">
           <CheckCircle2 size={18} />

@@ -4,10 +4,13 @@
  * Interaction flow:
  *   Tap → countdown starts (5 → 0)
  *   During countdown: tap again OR tap CANCEL → abort
- *   Countdown reaches 0 → SOS activates (Phase 3: contacts alerted)
+ *   Countdown reaches 0 → SOS activates → backend notified
  */
+import { useEffect } from 'react';
 import { Shield } from 'lucide-react';
 import useSosStore from '../../../stores/sosStore';
+import useNavigationStore from '../../../stores/navigationStore';
+import axiosInstance from '../../../services/api/axiosInstance';
 import './SOSButton.css';
 
 /* ── Countdown Overlay ── */
@@ -84,10 +87,57 @@ const SOSButton = () => {
     isActive,
     isCountingDown,
     countdown,
+    activeSosId,
     beginCountdown,
     cancelCountdown,
     resolveEmergency,
+    setActiveSosId,
+    alertContacts,
   } = useSosStore();
+
+  const userPosition = useNavigationStore((s) => s.userPosition);
+
+  // When SOS activates, call backend (non-blocking)
+  useEffect(() => {
+    if (!isActive) return;
+
+    const triggerSOS = async () => {
+      try {
+        const body = new FormData();
+        if (userPosition) {
+          body.append('latitude', String(userPosition[0]));
+          body.append('longitude', String(userPosition[1]));
+        } else {
+          body.append('latitude', '0');
+          body.append('longitude', '0');
+        }
+        const res = await axiosInstance.post('/sos', body, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        const sosLog = res.data?.sosLog;
+        if (sosLog?._id) setActiveSosId(sosLog._id);
+        const contacts = res.data?.trustedContacts || [];
+        if (contacts.length) alertContacts(contacts);
+      } catch (err) {
+        console.error('SOS backend trigger failed (non-blocking):', err);
+      }
+    };
+
+    triggerSOS();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
+
+  const handleResolve = async () => {
+    // Call backend resolve if we have an active SOS id
+    if (activeSosId) {
+      try {
+        await axiosInstance.patch(`/sos/${activeSosId}/resolve`);
+      } catch (err) {
+        console.error('SOS resolve failed (non-blocking):', err);
+      }
+    }
+    resolveEmergency();
+  };
 
   return (
     <>
@@ -98,7 +148,7 @@ const SOSButton = () => {
 
       {/* Active SOS full-screen overlay */}
       {isActive && (
-        <SOSActiveScreen onResolve={resolveEmergency} />
+        <SOSActiveScreen onResolve={handleResolve} />
       )}
 
       {/* FAB — always visible unless SOS is active */}
@@ -119,3 +169,5 @@ const SOSButton = () => {
 };
 
 export default SOSButton;
+
+

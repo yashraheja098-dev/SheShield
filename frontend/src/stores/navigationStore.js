@@ -15,10 +15,12 @@ const useNavigationStore = create((set, get) => ({
   remainingTime:     0,      /* seconds                  */
   hasDeviated:       false,
   deviationDistance: 0,      /* meters off-route         */
+  activeJourneyId:   null,   /* backend Journey._id      */
 
   /* ── Position ── */
   updatePosition: (latlng) => set({ userPosition: latlng }),
   setHeading:     (deg)    => set({ heading: deg }),
+  setActiveJourneyId: (id) => set({ activeJourneyId: id }),
 
   /* ── Navigation Lifecycle ── */
   startNavigation: (steps) =>
@@ -37,6 +39,7 @@ const useNavigationStore = create((set, get) => ({
       currentStepIndex: 0,
       hasDeviated:      false,
       deviationDistance:0,
+      activeJourneyId:  null,
     }),
 
   nextStep: () =>

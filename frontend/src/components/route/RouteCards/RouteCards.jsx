@@ -1,8 +1,10 @@
 import { formatDistance, formatDuration } from '../../../utils/formatters';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
+import useNavigationStore from '../../../stores/navigationStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
+import axiosInstance from '../../../services/api/axiosInstance';
 import './RouteCards.css';
 
 const RouteCard = ({ route, isActive, onClick, onStartNavigation }) => {
@@ -68,9 +70,40 @@ const RouteCards = () => {
   const setActiveRoute = useRouteStore((s) => s.setActiveRoute);
   const isLoading = useRouteStore((s) => s.isLoading);
   const error = useRouteStore((s) => s.error);
+  const origin = useRouteStore((s) => s.origin);
+  const destination = useRouteStore((s) => s.destination);
 
   const setAppMode = useUiStore((s) => s.setAppMode);
   const setBottomSheet = useUiStore((s) => s.setBottomSheet);
+
+  const setActiveJourneyId = useNavigationStore((s) => s.setActiveJourneyId);
+
+  const handleStartNavigation = async () => {
+    const activeRoute = routes[activeRouteIndex];
+    // Switch UI to navigating immediately so the user isn’t blocked
+    setAppMode(APP_MODES.NAVIGATING);
+    setBottomSheet(SHEET_STATES.HIDDEN);
+
+    // Fire-and-forget journey start; store the journey id for later use (end / SOS)
+    try {
+      const res = await axiosInstance.post('/journey/start', {
+        origin:      origin?.name || 'Current Location',
+        destination: destination?.name || 'Destination',
+        selectedRoute: {
+          distance:    activeRoute.distance,
+          duration:    String(activeRoute.duration) + 's',
+          polyline:    '',           // polyline string not stored in frontend route; backend accepts empty
+          safetyScore: activeRoute.safetyScore,
+          riskLevel:   activeRoute.riskLevel || 'Unknown',
+          coordinates: activeRoute.geometry || [],
+        },
+      });
+      const journeyId = res.data?.journey?._id;
+      if (journeyId) setActiveJourneyId(journeyId);
+    } catch (err) {
+      console.error('Journey start failed (non-blocking):', err);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -99,10 +132,7 @@ const RouteCards = () => {
           route={route}
           isActive={index === activeRouteIndex}
           onClick={() => setActiveRoute(index)}
-          onStartNavigation={() => {
-            setAppMode(APP_MODES.NAVIGATING);
-            setBottomSheet(SHEET_STATES.HIDDEN);
-          }}
+          onStartNavigation={handleStartNavigation}
         />
       ))}
     </div>

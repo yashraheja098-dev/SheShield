@@ -9,6 +9,7 @@ import useMapStore from '../../../stores/mapStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { formatDistance, formatDuration } from '../../../utils/formatters';
 import { rankSafePointsForRoute } from '../../../utils/safePointRanking';
+import axiosInstance from '../../../services/api/axiosInstance';
 import './ActiveJourneyPanel.css';
 
 const ActiveJourneyPanel = () => {
@@ -29,6 +30,7 @@ const ActiveJourneyPanel = () => {
   const remainingDistance = useNavigationStore((s) => s.remainingDistance);
   const remainingTime = useNavigationStore((s) => s.remainingTime);
   const hasDeviated = useNavigationStore((s) => s.hasDeviated);
+  const activeJourneyId = useNavigationStore((s) => s.activeJourneyId);
 
   const safePoints = useSafetyStore((s) => s.safePoints);
   const userPosition = useNavigationStore((s) => s.userPosition);
@@ -66,7 +68,15 @@ const ActiveJourneyPanel = () => {
   const safetyStatus = getSafetyStatus();
   const StatusIcon = safetyStatus.icon;
 
-  const handleEndJourney = () => {
+  const handleEndJourney = async () => {
+    // Notify backend that the journey is complete (non-blocking)
+    if (activeJourneyId) {
+      try {
+        await axiosInstance.post('/journey/end');
+      } catch (err) {
+        console.error('Journey end failed (non-blocking):', err);
+      }
+    }
     setAppMode(APP_MODES.IDLE);
     setBottomSheet(SHEET_STATES.PEEK);
     clearRoute();

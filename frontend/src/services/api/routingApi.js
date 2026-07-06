@@ -1,54 +1,116 @@
-import { calculateSafetyScore } from '../../utils/safetyScore';
-import useReportStore from '../../stores/reportStore';
+/**
+ * routingApi — Fetches safety-ranked route alternatives from the SheShield backend.
+ *
+ * Replaces the previous OSRM + fake safety score approach.
+ * Backend calls Google Routes API (or mock fallback) and returns routes
+ * pre-sorted by safety score descending. The encoded polyline is decoded
+ * here so the rest of the frontend gets the same [[lat,lng], ...] geometry
+ * it already expects.
+ */
+import axiosInstance from './axiosInstance';
+
+/**
+ * Decode a Google encoded polyline string into [[lat, lng], ...].
+ * Algorithm: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+ */
+const decodePolyline = (encoded) => {
+  const coords = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+
+  while (index < encoded.length) {
+    let result = 0;
+    let shift = 0;
+    let b;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lat += result & 1 ? ~(result >> 1) : result >> 1;
+
+    result = 0;
+    shift = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lng += result & 1 ? ~(result >> 1) : result >> 1;
+
+    coords.push([lat / 1e5, lng / 1e5]);
+  }
+
+  return coords;
+};
+
+/**
+ * Parse backend duration string ("750s") → number of seconds.
+ */
+const parseDuration = (durationStr) => {
+  if (typeof durationStr === 'number') return durationStr;
+  if (typeof durationStr === 'string') {
+    return parseInt(durationStr.replace('s', ''), 10) || 0;
+  }
+  return 0;
+};
+
+/**
+ * Derive a frontend route type from its index in the safety-sorted list.
+ * Backend already sorts safest-first.
+ */
+const deriveType = (index) => {
+  if (index === 0) return 'safe';
+  if (index === 1) return 'fast';
+  return 'balanced';
+};
+
+const deriveLabel = (routeLabel, index) => {
+  if (routeLabel && routeLabel !== 'Alternative Route') return routeLabel;
+  if (index === 0) return 'Safest Route';
+  if (index === 1) return 'Fastest Route';
+  return 'Balanced';
+};
 
 export const routingApi = {
   /**
-   * Get safe route options between two points using OSRM.
-   * Real API: GET /route/v1/driving/{lon},{lat};{lon},{lat}
+   * Get safety-ranked route options between two points.
+   * Calls POST /api/routes/analyze on the SheShield backend.
+   *
+   * @param {{ lat: number, lng: number, name?: string }} origin
+   * @param {{ lat: number, lng: number, name?: string }} destination
+   * @returns {Promise<RouteOption[]>}
    */
   getSafeRoutes: async (origin, destination) => {
     try {
-      // OSRM expects coordinates in lon,lat order
-      const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&alternatives=true`;
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Routing failed');
-      
-      const data = await response.json();
-      
-      if (!data.routes || data.routes.length === 0) {
-        throw new Error('No routes found');
-      }
+      // Backend accepts address strings OR { latitude, longitude } objects
+      const res = await axiosInstance.post('/routes/analyze', {
+        origin:      { latitude: origin.lat,      longitude: origin.lng },
+        destination: { latitude: destination.lat, longitude: destination.lng },
+      });
 
-      // Map OSRM routes to our RouteOption format
-      return data.routes.map((route, index) => {
-        const distance = route.distance; // in meters
-        const duration = route.duration; // in seconds
-        
-        // OSRM geojson geometry returns array of [lon, lat]. 
-        // Leaflet Polyline expects array of [lat, lon].
-        const geometry = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-        
-        // Fetch real-time community reports from Zustand
-        const reports = useReportStore.getState().reports || [];
+      const rawRoutes = res.data?.routes || [];
 
-        // Use deterministic mock logic for safety score, now strictly augmented by real community reports
-        const { score, warnings } = calculateSafetyScore(distance, index, geometry, reports);
-        
+      return rawRoutes.map((route, index) => {
+        const geometry = decodePolyline(route.polyline);
+
         return {
-          id: `route_${index}`,
-          type: index === 0 ? 'safe' : (index === 1 ? 'fast' : 'balanced'),
-          label: index === 0 ? 'Safest Route' : (index === 1 ? 'Fastest Route' : 'Balanced'),
-          safetyScore: score,
-          duration: duration,
-          distance: distance,
-          geometry: geometry,
-          warnings: warnings,
+          id:           `route_${index}`,
+          type:         deriveType(index),
+          label:        deriveLabel(route.routeLabel, index),
+          safetyScore:  route.safetyScore,
+          riskLevel:    route.riskLevel,
+          duration:     parseDuration(route.duration),
+          distance:     route.distance,
+          geometry,
+          // Backend returns safetyExplanation; map to warnings for existing RouteCards
+          warnings:     route.safetyExplanation || [],
         };
       });
     } catch (error) {
       console.error('Routing API error:', error);
       throw error;
     }
-  }
+  },
 };
