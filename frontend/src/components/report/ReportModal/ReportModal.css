@@ -95,6 +95,62 @@
   color: #ff9800;
 }
 
+/* ── Severity ── */
+.report-severity-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.report-section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.report-severity-grid {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.report-severity-pill {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.report-severity-pill:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+}
+
+.report-severity-pill.selected-low {
+  background: rgba(0, 230, 118, 0.15);
+  border-color: #00e676;
+  color: #00e676;
+}
+
+.report-severity-pill.selected-medium {
+  background: rgba(255, 179, 0, 0.15);
+  border-color: #ffb300;
+  color: #ffb300;
+}
+
+.report-severity-pill.selected-high {
+  background: rgba(255, 23, 68, 0.15);
+  border-color: #ff1744;
+  color: #ff1744;
+}
+
 /* ── Description ── */
 .report-textarea {
   width: 100%;
@@ -120,6 +176,16 @@
 
 .report-textarea::placeholder {
   color: var(--color-text-muted);
+}
+
+/* ── Location Display ── */
+.report-location-display {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--sp-4);
+  font-weight: var(--weight-medium);
+  opacity: 0.8;
 }
 
 /* ── Actions ── */

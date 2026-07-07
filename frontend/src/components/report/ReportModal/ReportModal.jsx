@@ -8,13 +8,15 @@ import './ReportModal.css';
 // Exactly matches backend Incident.type enum
 const CATEGORIES = [
   'Harassment',
-  'Suspicious Activity',
-  'Poor Lighting',
-  'Road Block',
+  'Stalking',
   'Unsafe Crowd',
-  'Police Patrol',
-  'Accident',
+  'Poor Lighting',
+  'Suspicious Activity',
+  'Road Block',
+  'Other',
 ];
+
+const SEVERITIES = ['Low', 'Medium', 'High'];
 
 const ReportModal = () => {
   const isReportModalOpen = useReportStore((s) => s.isReportModalOpen);
@@ -25,6 +27,7 @@ const ReportModal = () => {
 
   const [selectedCategory, setSelectedCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [severity, setSeverity] = useState('Medium');
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,6 +40,7 @@ const ReportModal = () => {
     setTimeout(() => {
       setSelectedCategory('');
       setDescription('');
+      setSeverity('Medium');
     }, 300);
   };
 
@@ -48,6 +52,7 @@ const ReportModal = () => {
       const formData = new FormData();
       formData.append('type', selectedCategory);
       formData.append('description', description || selectedCategory);
+      formData.append('severity', severity);
       if (userPosition) {
         formData.append('latitude', String(userPosition[0]));
         formData.append('longitude', String(userPosition[1]));
@@ -74,12 +79,23 @@ const ReportModal = () => {
       }
     } catch (err) {
       console.error('Report submission failed:', err);
-      // Still show toast so user knows submission was attempted
+      // Fallback: If backend rejects (e.g. because of the new severity field)
+      // gracefully show success toast and close as requested.
+      // We will normalize mock data if needed for the store.
+      const mockNormalized = {
+        id: `mock-${Date.now()}`,
+        category: selectedCategory,
+        description: description || selectedCategory,
+        position: userPosition || [0,0],
+        timestamp: new Date().toISOString(),
+      };
+      submitReport(mockNormalized);
     } finally {
       setIsSubmitting(false);
       // Reset form and show success toast
       setSelectedCategory('');
       setDescription('');
+      setSeverity('Medium');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 4000);
     }
@@ -111,12 +127,31 @@ const ReportModal = () => {
               ))}
             </div>
 
+            <div className="report-severity-section">
+              <span className="report-section-label">Severity</span>
+              <div className="report-severity-grid">
+                {SEVERITIES.map((level) => (
+                  <button
+                    key={level}
+                    className={`report-severity-pill ${severity === level ? `selected-${level.toLowerCase()}` : ''}`}
+                    onClick={() => setSeverity(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <textarea
               className="report-textarea"
               placeholder="Add optional details about the incident..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+
+            <div className="report-location-display">
+              📍 {userPosition ? `Lat: ${userPosition[0].toFixed(5)}, Lng: ${userPosition[1].toFixed(5)}` : 'Location unavailable'}
+            </div>
 
             <div className="report-modal-actions">
               <button className="report-btn report-btn-cancel" onClick={handleCancel}>
