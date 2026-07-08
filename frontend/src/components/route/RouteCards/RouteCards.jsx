@@ -132,7 +132,7 @@ const RouteCards = () => {
         selectedRoute: {
           distance:    activeRoute.distance,
           duration:    String(activeRoute.duration) + 's',
-          polyline:    '',           // polyline string not stored in frontend route; backend accepts empty
+          polyline:    activeRoute.polyline || 'frontend_simulated_polyline',
           safetyScore: activeRoute.safetyScore,
           riskLevel:   activeRoute.riskLevel || 'Unknown',
           coordinates: activeRoute.geometry || [],

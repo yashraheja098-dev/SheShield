@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertTriangle, ShieldAlert } from 'lucide-react';
 import useAlertStore from '../../../stores/alertStore';
+import useSosStore from '../../../stores/sosStore';
 import SafePointSuggestions from '../../safety/SafePointSuggestions/SafePointSuggestions';
 import './AlertModal.css';
 
@@ -8,9 +9,9 @@ const AlertModal = () => {
   const isModalVisible = useAlertStore((s) => s.isModalVisible);
   const hideModal = useAlertStore((s) => s.hideModal);
   
-  const [showToast, setShowToast] = useState(false);
-
-  if (!isModalVisible && !showToast) return null;
+  const activateSOSNow = useSosStore((s) => s.activateSOSNow);
+  
+  if (!isModalVisible) return null;
 
   const handleReturn = () => {
     hideModal();
@@ -22,9 +23,8 @@ const AlertModal = () => {
 
   const handleAlert = () => {
     hideModal();
-    // Simulate premium toast
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
+    // Trigger real SOS flow
+    activateSOSNow();
   };
 
   return (
@@ -61,13 +61,6 @@ const AlertModal = () => {
       </div>
       )}
 
-      {/* Simulated Toast for Hackathon Demo */}
-      {showToast && (
-        <div className="alert-toast">
-          <ShieldAlert size={18} />
-          Emergency alert sent. Live location sharing activated.
-        </div>
-      )}
     </>
   );
 };

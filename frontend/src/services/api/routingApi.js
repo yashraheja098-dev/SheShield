@@ -104,6 +104,7 @@ export const routingApi = {
           duration:     parseDuration(route.duration),
           distance:     route.distance,
           geometry,
+          polyline:     route.polyline,
           // Backend returns safetyExplanation; map to warnings for existing RouteCards
           warnings:     route.safetyExplanation || [],
           isMock:       route.isMock || false,
