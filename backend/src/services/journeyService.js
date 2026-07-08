@@ -21,13 +21,13 @@ export const startJourney = async (userId, { origin, destination, selectedRoute 
     destination,
     selectedRoute,
     currentLocation: {
-      latitude: selectedRoute.coordinates[0][0],
-      longitude: selectedRoute.coordinates[0][1]
+      latitude: selectedRoute.coordinates?.length > 0 ? selectedRoute.coordinates[0][0] : 0,
+      longitude: selectedRoute.coordinates?.length > 0 ? selectedRoute.coordinates[0][1] : 0
     },
     locationHistory: [
       {
-        latitude: selectedRoute.coordinates[0][0],
-        longitude: selectedRoute.coordinates[0][1]
+        latitude: selectedRoute.coordinates?.length > 0 ? selectedRoute.coordinates[0][0] : 0,
+        longitude: selectedRoute.coordinates?.length > 0 ? selectedRoute.coordinates[0][1] : 0
       }
     ]
   });
