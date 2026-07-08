@@ -42,6 +42,19 @@ const useSosStore = create((set, get) => ({
     set({ isCountingDown: true, countdown: 5, _timerId: id });
   },
 
+  /* ── Immediately trigger SOS without waiting ── */
+  activateSOSNow: () => {
+    const { _timerId } = get();
+    if (_timerId) clearInterval(_timerId);
+    set({
+      isCountingDown: false,
+      isActive:       true,
+      countdown:      5,
+      triggeredAt:    Date.now(),
+      _timerId:       null,
+    });
+  },
+
   /* ── Cancel before it fires ── */
   cancelCountdown: () => {
     const { _timerId } = get();

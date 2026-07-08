@@ -6,15 +6,15 @@
  *   During countdown: tap again OR tap CANCEL → abort
  *   Countdown reaches 0 → SOS activates → backend notified
  */
-import { useEffect } from 'react';
-import { Shield } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Shield, MapPin, AlertTriangle, Users, MicOff, RefreshCw } from 'lucide-react';
 import useSosStore from '../../../stores/sosStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import axiosInstance from '../../../services/api/axiosInstance';
 import './SOSButton.css';
 
 /* ── Countdown Overlay ── */
-const SOSCountdown = ({ countdown, onCancel }) => (
+const SOSCountdown = ({ countdown, onCancel, onActivateNow }) => (
   <div
     className="sos-overlay"
     role="alertdialog"
@@ -46,40 +46,98 @@ const SOSCountdown = ({ countdown, onCancel }) => (
         Your trusted contacts will be notified with your live location
       </p>
 
-      <button
-        id="sos-cancel-btn"
-        className="sos-cancel-btn"
-        onClick={onCancel}
-        autoFocus
-      >
-        Cancel
-      </button>
+      <div className="sos-countdown-actions">
+        <button
+          id="sos-cancel-btn"
+          className="sos-cancel-btn"
+          onClick={onCancel}
+          autoFocus
+        >
+          Cancel
+        </button>
+        <button
+          className="sos-activate-now-btn"
+          onClick={onActivateNow}
+        >
+          Activate Now
+        </button>
+      </div>
     </div>
   </div>
 );
 
-/* ── Active SOS Screen ── */
-const SOSActiveScreen = ({ onResolve }) => (
-  <div className="sos-active-screen" role="alertdialog" aria-modal="true">
-    <div className="sos-active-content anim-scale-in">
-      <div className="sos-active-icon">
-        <Shield size={48} />
-      </div>
-      <h2 className="sos-active-title">SOS Activated</h2>
-      <p className="sos-active-subtitle">
-        Emergency mode is active. Stay calm — press Call 112 to reach emergency services directly.
-      </p>
+/* ── Active SOS Screen (Compact Panel) ── */
+const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contactsAlerted, triggeredAt }) => {
+  const [confirmEnd, setConfirmEnd] = useState(false);
+  const [elapsed, setElapsed] = useState('00:00');
 
-      <div className="sos-active-number">
-        <a href="tel:112" className="sos-call-btn">📞 Call 112</a>
+  useEffect(() => {
+    if (!triggeredAt) return;
+    const interval = setInterval(() => {
+      const diff = Math.floor((Date.now() - triggeredAt) / 1000);
+      const m = String(Math.floor(diff / 60)).padStart(2, '0');
+      const s = String(diff % 60).padStart(2, '0');
+      setElapsed(`${m}:${s}`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [triggeredAt]);
+
+  return (
+    <div className="sos-active-panel anim-slide-up" role="alertdialog" aria-modal="true">
+      <div className="sos-active-header">
+        <div className="sos-active-header-left">
+          <div className="sos-active-icon-small">
+            <Shield size={20} />
+          </div>
+          <div>
+            <h2 className="sos-active-title">SOS ACTIVE</h2>
+            <div className="sos-active-time">{elapsed} elapsed</div>
+          </div>
+        </div>
+        <a href="tel:112" className="sos-call-btn-small">📞 Call 112</a>
       </div>
 
-      <button className="sos-safe-btn" onClick={onResolve}>
-        I'm Safe Now
-      </button>
+      <div className="sos-status-list">
+        <div className="sos-status-item">
+          <MapPin size={16} />
+          <span>Location: {userPosition ? "Ready & Shared" : "Unavailable"}</span>
+        </div>
+        
+        <div className={`sos-status-item ${apiStatus === 'error' ? 'error' : ''}`}>
+          <AlertTriangle size={16} />
+          <span>Alert: {apiStatus === 'pending' ? 'Dispatching...' : apiStatus === 'success' ? 'Dispatched' : 'Failed to Dispatch'}</span>
+          {apiStatus === 'error' && (
+            <button className="sos-retry-btn" onClick={onRetry}><RefreshCw size={14} /></button>
+          )}
+        </div>
+
+        <div className="sos-status-item">
+          <Users size={16} />
+          <span>Contacts: {apiStatus === 'success' ? (contactsAlerted?.length ? 'Notified' : 'None Configured') : 'Pending'}</span>
+        </div>
+
+        <div className="sos-status-item muted">
+          <MicOff size={16} />
+          <span>Recording: Not Configured</span>
+        </div>
+      </div>
+
+      <div className="sos-active-actions">
+        {confirmEnd ? (
+          <div className="sos-confirm-end">
+            <span>End SOS?</span>
+            <button className="sos-btn-yes" onClick={onResolve}>Yes, End</button>
+            <button className="sos-btn-no" onClick={() => setConfirmEnd(false)}>Cancel</button>
+          </div>
+        ) : (
+          <button className="sos-safe-btn" onClick={() => setConfirmEnd(true)}>
+            I'm Safe Now
+          </button>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /* ── Main Component ── */
 const SOSButton = () => {
@@ -88,41 +146,47 @@ const SOSButton = () => {
     isCountingDown,
     countdown,
     activeSosId,
+    contactsAlerted,
+    triggeredAt,
     beginCountdown,
     cancelCountdown,
+    activateSOSNow,
     resolveEmergency,
     setActiveSosId,
     alertContacts,
   } = useSosStore();
 
   const userPosition = useNavigationStore((s) => s.userPosition);
+  const [apiStatus, setApiStatus] = useState('pending'); // 'pending' | 'success' | 'error'
+
+  const triggerSOS = async () => {
+    setApiStatus('pending');
+    try {
+      const body = new FormData();
+      if (userPosition) {
+        body.append('latitude', String(userPosition[0]));
+        body.append('longitude', String(userPosition[1]));
+      } else {
+        body.append('latitude', '0');
+        body.append('longitude', '0');
+      }
+      const res = await axiosInstance.post('/sos', body, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const sosLog = res.data?.sosLog || res.data?.data?.sosLog;
+      if (sosLog?._id) setActiveSosId(sosLog._id);
+      const contacts = res.data?.trustedContacts || res.data?.data?.trustedContacts || [];
+      if (contacts.length) alertContacts(contacts);
+      setApiStatus('success');
+    } catch (err) {
+      console.error('SOS backend trigger failed:', err);
+      setApiStatus('error');
+    }
+  };
 
   // When SOS activates, call backend (non-blocking)
   useEffect(() => {
     if (!isActive) return;
-
-    const triggerSOS = async () => {
-      try {
-        const body = new FormData();
-        if (userPosition) {
-          body.append('latitude', String(userPosition[0]));
-          body.append('longitude', String(userPosition[1]));
-        } else {
-          body.append('latitude', '0');
-          body.append('longitude', '0');
-        }
-        const res = await axiosInstance.post('/sos', body, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        const sosLog = res.data?.sosLog;
-        if (sosLog?._id) setActiveSosId(sosLog._id);
-        const contacts = res.data?.trustedContacts || [];
-        if (contacts.length) alertContacts(contacts);
-      } catch (err) {
-        console.error('SOS backend trigger failed (non-blocking):', err);
-      }
-    };
-
     triggerSOS();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
@@ -136,6 +200,7 @@ const SOSButton = () => {
         console.error('SOS resolve failed (non-blocking):', err);
       }
     }
+    setApiStatus('pending');
     resolveEmergency();
   };
 
@@ -143,12 +208,23 @@ const SOSButton = () => {
     <>
       {/* Countdown modal */}
       {isCountingDown && (
-        <SOSCountdown countdown={countdown} onCancel={cancelCountdown} />
+        <SOSCountdown 
+          countdown={countdown} 
+          onCancel={cancelCountdown} 
+          onActivateNow={activateSOSNow}
+        />
       )}
 
-      {/* Active SOS full-screen overlay */}
+      {/* Active SOS compact panel overlay */}
       {isActive && (
-        <SOSActiveScreen onResolve={handleResolve} />
+        <SOSActiveScreen 
+          onResolve={handleResolve}
+          apiStatus={apiStatus}
+          userPosition={userPosition}
+          onRetry={triggerSOS}
+          contactsAlerted={contactsAlerted}
+          triggeredAt={triggeredAt}
+        />
       )}
 
       {/* FAB — always visible unless SOS is active */}
