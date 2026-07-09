@@ -8,7 +8,7 @@ import './AlertModal.css';
 const AlertModal = () => {
   const isModalVisible = useAlertStore((s) => s.isModalVisible);
   const hideModal = useAlertStore((s) => s.hideModal);
-  
+  const acknowledgeSafe = useAlertStore((s) => s.acknowledgeSafe);
   const activateSOSNow = useSosStore((s) => s.activateSOSNow);
   
   if (!isModalVisible) return null;
@@ -18,7 +18,7 @@ const AlertModal = () => {
   };
 
   const handleSafe = () => {
-    hideModal();
+    acknowledgeSafe();
   };
 
   const handleAlert = () => {

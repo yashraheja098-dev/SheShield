@@ -15,7 +15,7 @@ const GEO_OPTIONS = {
 /**
  * @returns {{ position: GeoPosition|null, error: string|null, isLoading: boolean }}
  */
-const useGeolocation = () => {
+const useGeolocation = (continuous = false) => {
   const [position, setPosition] = useState(null);
   const [error,    setError]    = useState(null);
   const [isLoading,setIsLoading]= useState(true);
@@ -39,6 +39,7 @@ const useGeolocation = () => {
   }, []);
 
   useEffect(() => {
+    let watchId;
     let cancelled = false;
 
     if (!navigator.geolocation) {
@@ -47,14 +48,28 @@ const useGeolocation = () => {
       return;
     }
 
+    // Always get initial position first
     navigator.geolocation.getCurrentPosition(
       (pos) => { if (!cancelled) onSuccess(pos); },
       (err) => { if (!cancelled) onError(err);   },
       GEO_OPTIONS
     );
 
-    return () => { cancelled = true; };
-  }, [onSuccess, onError]);
+    if (continuous) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => { if (!cancelled) onSuccess(pos); },
+        (err) => { if (!cancelled) onError(err);   },
+        GEO_OPTIONS
+      );
+    }
+
+    return () => {
+      cancelled = true;
+      if (watchId !== undefined) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [onSuccess, onError, continuous]);
 
   return { position, error, isLoading };
 };

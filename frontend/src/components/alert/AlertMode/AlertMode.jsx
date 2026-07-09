@@ -22,6 +22,8 @@ const AlertMode = () => {
   const toggleAlertMode = useAlertStore((s) => s.toggleAlertMode);
   const showModal = useAlertStore((s) => s.showModal);
   const isModalVisible = useAlertStore((s) => s.isModalVisible);
+  const isCooldownActive = useAlertStore((s) => s.isCooldownActive);
+  const clearCooldown = useAlertStore((s) => s.clearCooldown);
 
   // Monitor position for deviation
   useEffect(() => {
@@ -34,15 +36,22 @@ const AlertMode = () => {
     const { distance } = closestPointOnRoute(userPosition, currentRoute.coordinates);
     
     if (distance > DEVIATION_THRESHOLD_METERS) {
-      showModal();
+      if (!isCooldownActive) {
+        showModal();
+      }
+    } else {
+      if (isCooldownActive) {
+        clearCooldown();
+      }
     }
-  }, [userPosition, isAlertModeActive, appMode, isModalVisible, routes, activeRouteIndex, showModal]);
+  }, [userPosition, isAlertModeActive, appMode, isModalVisible, isCooldownActive, routes, activeRouteIndex, showModal, clearCooldown]);
 
   // Bind simulateDeviation for hackathon demo (only in development)
   useEffect(() => {
     if (import.meta.env.DEV) {
       window.simulateDeviation = () => {
         if (appMode === APP_MODES.NAVIGATING) {
+          clearCooldown();
           showModal();
           console.log("Simulated deviation triggered.");
         } else {
@@ -56,7 +65,7 @@ const AlertMode = () => {
         delete window.simulateDeviation;
       }
     };
-  }, [appMode, showModal]);
+  }, [appMode, showModal, clearCooldown]);
 
   // Alert Mode UI only exists during navigation
   if (appMode !== APP_MODES.NAVIGATING) {

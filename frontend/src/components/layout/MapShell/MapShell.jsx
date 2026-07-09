@@ -29,13 +29,16 @@ import useNavigationStore from '../../../stores/navigationStore';
 import useSafetyStore from '../../../stores/safetyStore';
 import useReportStore from '../../../stores/reportStore';
 import useJourneyTracker from '../../../hooks/useJourneyTracker';
+import useUiStore from '../../../stores/uiStore';
 import axiosInstance from '../../../services/api/axiosInstance';
+import { APP_MODES } from '../../../constants/appConstants';
 
 import './MapShell.css';
 
 const MapShell = () => {
+  const appMode = useUiStore((s) => s.appMode);
   /* Single geolocation call for the entire app */
-  const { position } = useGeolocation();
+  const { position } = useGeolocation(appMode === APP_MODES.NAVIGATING);
   const updatePosition = useNavigationStore((s) => s.updatePosition);
   
   const setHeatMapData = useSafetyStore((s) => s.setHeatMapData);
