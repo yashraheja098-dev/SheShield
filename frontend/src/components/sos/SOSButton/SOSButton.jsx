@@ -162,14 +162,42 @@ const SOSButton = () => {
   const triggerSOS = async () => {
     setApiStatus('pending');
     try {
-      const body = new FormData();
-      if (userPosition) {
-        body.append('latitude', String(userPosition[0]));
-        body.append('longitude', String(userPosition[1]));
-      } else {
-        body.append('latitude', '0');
-        body.append('longitude', '0');
+      let finalLat = 0;
+      let finalLng = 0;
+
+      // Attempt to get fresh GPS location with a 5-second timeout
+      if (navigator.geolocation) {
+        try {
+          const freshPosition = await Promise.race([
+            new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+              });
+            }),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('GPS timeout')), 5000)
+            )
+          ]);
+          finalLat = freshPosition.coords.latitude;
+          finalLng = freshPosition.coords.longitude;
+        } catch (gpsError) {
+          console.warn('Failed to get fresh GPS for SOS, falling back to cached position:', gpsError.message);
+          if (userPosition) {
+            finalLat = userPosition[0];
+            finalLng = userPosition[1];
+          }
+        }
+      } else if (userPosition) {
+        finalLat = userPosition[0];
+        finalLng = userPosition[1];
       }
+
+      const body = new FormData();
+      body.append('latitude', String(finalLat));
+      body.append('longitude', String(finalLng));
+
       const res = await axiosInstance.post('/sos', body, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
