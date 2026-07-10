@@ -2,7 +2,10 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 8px 16px;
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+  height: 40px;
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -32,4 +35,19 @@
 .alert-mode-icon {
   font-size: 16px;
   line-height: 1;
+}
+
+.alert-mode-label {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .alert-mode-pill {
+    width: auto;
+    padding: 0 16px;
+    height: 44px;
+  }
+  .alert-mode-label {
+    display: block;
+  }
 }

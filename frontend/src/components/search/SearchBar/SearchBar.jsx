@@ -88,6 +88,14 @@ const SearchBar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Clear destQuery when app returns to IDLE (e.g., Journey Ended)
+  useEffect(() => {
+    if (appMode === APP_MODES.IDLE) {
+      setDestQuery('');
+      setFocusedField(null);
+    }
+  }, [appMode]);
+
   const handleFocus = (field) => {
     setFocusedField(field);
     if (appMode !== APP_MODES.PLANNING) {

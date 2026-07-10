@@ -3,14 +3,17 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  padding: 0;
+  height: 40px;
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border-strong);
   border-radius: var(--r-full);
   color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-base);
@@ -34,23 +37,17 @@
   color: #ff9800; /* Warning orange color for report */
 }
 
+.report-label {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .report-incident-btn {
     width: auto;
     padding: 0 16px;
     height: 44px;
-    font-size: var(--text-sm);
-    font-weight: var(--weight-semibold);
   }
-  
   .report-label {
     display: block;
-  }
-}
-
-/* Hide text label on mobile, keep it square */
-@media (max-width: 767px) {
-  .report-label {
-    display: none;
   }
 }

@@ -5,8 +5,8 @@
 /* ── FAB ── */
 .sos-fab {
   position: relative;
-  width: 62px;
-  height: 62px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
 
   background: linear-gradient(145deg, #FF1744 0%, #C2185B 100%);
@@ -58,8 +58,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 62px;
-  height: 62px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   border: 2px solid rgba(255, 23, 68, 0.5);
   animation: sos-ring 2.2s ease-out infinite;
@@ -197,24 +197,28 @@
 /* ══ Active SOS Panel (Compact) ══ */
 
 .sos-active-panel {
-  position: absolute;
-  bottom: 80px;
-  right: 0;
+  position: fixed;
+  bottom: var(--sp-4);
+  left: 50%;
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
   border: 1px solid rgba(255, 23, 68, 0.35);
   border-radius: var(--r-xl);
-  padding: var(--sp-5);
-  width: calc(100vw - var(--sp-8));
-  max-width: 360px;
+  padding: var(--sp-4);
+  width: calc(100vw - 32px);
+  max-width: none;
   box-shadow: var(--shadow-xl), var(--shadow-glow-danger);
-  z-index: var(--z-sos);
+  z-index: var(--z-modal);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-  animation: anim-slide-up var(--transition-base) both;
-  transform-origin: bottom right;
+  gap: var(--sp-3);
+  animation: anim-slide-up-center var(--transition-base) both;
+}
+
+@keyframes anim-slide-up-center {
+  from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
 @keyframes anim-slide-up {
@@ -249,7 +253,7 @@
 }
 
 .sos-active-title {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: var(--weight-bold);
   color: var(--color-danger);
   margin: 0;
@@ -264,10 +268,10 @@
 .sos-call-btn-small {
   background: var(--color-danger);
   color: #fff;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: var(--r-full);
   font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   text-decoration: none;
   box-shadow: 0 4px 12px rgba(255, 23, 68, 0.4);
 }
@@ -281,11 +285,11 @@
 .sos-status-item {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  font-size: var(--text-sm);
+  gap: var(--sp-2);
+  font-size: 13px;
   color: var(--color-text-primary);
   background: var(--color-surface);
-  padding: var(--sp-2) var(--sp-3);
+  padding: 6px var(--sp-2);
   border-radius: var(--r-md);
 }
 
@@ -319,10 +323,10 @@
   background: var(--color-surface-raised);
   border: 1px solid var(--glass-border);
   color: var(--color-text-primary);
-  padding: var(--sp-3);
+  padding: 8px;
   border-radius: var(--r-full);
   font-weight: var(--weight-semibold);
-  font-size: var(--text-sm);
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -366,10 +370,26 @@
 
 /* ══ Desktop Refinements (Compact Panel) ══ */
 @media (min-width: 768px) {
+  .sos-fab {
+    width: 62px;
+    height: 62px;
+  }
+  .sos-fab-ring {
+    width: 62px;
+    height: 62px;
+  }
+
   .sos-active-panel {
+    position: absolute;
+    bottom: 80px;
+    left: auto;
+    right: 0;
+    transform: none;
     max-width: 290px;
     padding: var(--sp-4);
     gap: var(--sp-3);
+    animation: anim-slide-up var(--transition-base) both;
+    transform-origin: bottom right;
   }
 
   .sos-active-header {

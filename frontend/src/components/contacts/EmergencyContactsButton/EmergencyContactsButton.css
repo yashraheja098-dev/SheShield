@@ -2,8 +2,8 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--color-text-primary);
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -14,6 +14,7 @@
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-left: 8px; /* Spacing from SearchBar */
+  flex-shrink: 0;
 }
 
 .emergency-contacts-btn:hover {
@@ -25,4 +26,11 @@
 
 .emergency-contacts-btn:active {
   transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+  .emergency-contacts-btn {
+    width: 44px;
+    height: 44px;
+  }
 }

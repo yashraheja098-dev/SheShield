@@ -82,7 +82,9 @@ const AlertMode = () => {
       <span className="alert-mode-icon" aria-hidden="true">
         {isAlertModeActive ? '🟢' : '🛡'}
       </span>
-      {isAlertModeActive ? 'Alert Mode Active' : 'Alert Mode'}
+      <span className="alert-mode-label">
+        {isAlertModeActive ? 'Alert Mode Active' : 'Alert Mode'}
+      </span>
     </button>
   );
 };

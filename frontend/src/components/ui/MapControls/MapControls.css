@@ -13,8 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--r-md);
 
   /* Glass */
@@ -57,4 +57,20 @@
 .map-ctrl-btn:first-child:hover {
   background: var(--color-primary-alpha);
   border-color: var(--color-primary);
+}
+
+#ctrl-zoom-in,
+#ctrl-zoom-out {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .map-ctrl-btn {
+    width: 42px;
+    height: 42px;
+  }
+  #ctrl-zoom-in,
+  #ctrl-zoom-out {
+    display: flex;
+  }
 }

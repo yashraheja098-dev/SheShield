@@ -7,7 +7,7 @@ import './LoginScreen.css';
 
 const LoginScreen = () => {
   const navigate = useNavigate();
-  
+
   // UI State
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +19,7 @@ const LoginScreen = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const setToken = useUserStore((s) => s.setToken);
   const setProfile = useUserStore((s) => s.setProfile);
 
@@ -38,11 +38,11 @@ const LoginScreen = () => {
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
-    
+
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
-    
+
     try {
       const res = await axiosInstance.post('/auth/login', { email, password });
       setToken(res.data.token);
@@ -57,15 +57,15 @@ const LoginScreen = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
+
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
-    
+
     try {
       // 1. Register the user
       await axiosInstance.post('/auth/register', { name, email, phone, password });
-      
+
       // 2. Switch to login view and show success message
       setIsRegistering(false);
       setName('');
@@ -93,9 +93,9 @@ const LoginScreen = () => {
   return (
     <div className="login-container">
       <div className="login-background-glow" />
-      
+
       <div className="login-card">
-        
+
         {/* Header */}
         <div className="login-header">
           <div className="login-logo-container">
@@ -109,13 +109,13 @@ const LoginScreen = () => {
 
         {/* Form */}
         <form className="login-form" onSubmit={isRegistering ? handleRegister : handleLogin}>
-          
+
           {isRegistering && (
             <>
               <div className="login-input-group">
                 <label className="login-label">Full Name</label>
                 <div className="login-input-wrapper">
-                  <input 
+                  <input
                     type="text"
                     className="login-input"
                     placeholder="Enter your full name"
@@ -129,7 +129,7 @@ const LoginScreen = () => {
               <div className="login-input-group">
                 <label className="login-label">Phone Number</label>
                 <div className="login-input-wrapper">
-                  <input 
+                  <input
                     type="tel"
                     className="login-input"
                     placeholder="Enter your phone number"
@@ -145,7 +145,7 @@ const LoginScreen = () => {
           <div className="login-input-group">
             <label className="login-label">Email</label>
             <div className="login-input-wrapper">
-              <input 
+              <input
                 type="email"
                 className="login-input"
                 placeholder="Enter your email"
@@ -159,7 +159,7 @@ const LoginScreen = () => {
           <div className="login-input-group">
             <label className="login-label">Password</label>
             <div className="login-input-wrapper">
-              <input 
+              <input
                 type={showPassword ? "text" : "password"}
                 className="login-input"
                 placeholder="Enter your password"
@@ -167,7 +167,7 @@ const LoginScreen = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button 
+              <button
                 type="button"
                 className="login-password-toggle"
                 onClick={() => setShowPassword(!showPassword)}

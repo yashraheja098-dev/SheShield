@@ -4,6 +4,8 @@
 
 .search-bar-container {
   width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .search-panel-wrapper {
@@ -40,8 +42,8 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 0 44px 0 var(--sp-3); /* Smaller padding on left, enough for swap button on right */
-  height: 44px; /* Reduced from 50px */
+  padding: 0 32px 0 var(--sp-2); /* Smaller padding on left, enough for swap button on right */
+  height: 36px; /* Highly compact for mobile */
 }
 
 /* ── Horizontal Divider ── */
@@ -74,7 +76,7 @@
   border: none;
   outline: none;
   color: var(--color-text-primary);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   caret-color: var(--color-primary);
   height: 100%;
@@ -142,11 +144,11 @@
 /* ── Swap Button ── */
 .search-swap-btn {
   position: absolute;
-  right: var(--sp-3);
+  right: var(--sp-2);
   top: 50%;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--r-full);
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur-heavy);
@@ -170,4 +172,19 @@
 
 .search-swap-btn:active {
   transform: translateY(-50%) scale(0.95);
+}
+
+@media (min-width: 768px) {
+  .search-row {
+    padding: 0 44px 0 var(--sp-3);
+    height: 44px;
+  }
+  .search-input {
+    font-size: var(--text-base);
+  }
+  .search-swap-btn {
+    width: 32px;
+    height: 32px;
+    right: var(--sp-3);
+  }
 }

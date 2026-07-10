@@ -62,31 +62,64 @@ export const geocodeAddress = async (address) => {
   }
 };
 
-const generateMockRoutes = (start, end) => {
-  // Generate 3 mock routes
-  // Route 1: Straight line (Normal/Fastest)
-  const route1Points = [
-    [start.latitude, start.longitude],
-    [end.latitude, end.longitude]
-  ];
+const generateRealisticPath = (start, end, numWaypoints, maxDeviation, biasMultiplier) => {
+  const points = [[start.latitude, start.longitude]];
+  const dx = end.latitude - start.latitude;
+  const dy = end.longitude - start.longitude;
+  const totalDist = Math.sqrt(dx * dx + dy * dy);
   
-  // Route 2: Deviation East (representing a route with more Police / Safe points)
-  const mid1Lat = (start.latitude + end.latitude) / 2 + 0.003;
-  const mid1Lng = (start.longitude + end.longitude) / 2 + 0.003;
-  const route2Points = [
-    [start.latitude, start.longitude],
-    [mid1Lat, mid1Lng],
-    [end.latitude, end.longitude]
-  ];
+  if (totalDist === 0) {
+    points.push([end.latitude, end.longitude]);
+    return points;
+  }
+  
+  const perpX = -dy / totalDist;
+  const perpY = dx / totalDist;
+  
+  let currentOffset = 0;
+  
+  for (let i = 1; i <= numWaypoints; i++) {
+    const t = i / (numWaypoints + 1); 
+    
+    const baseLat = start.latitude + dx * t;
+    const baseLng = start.longitude + dy * t;
+    
+    // Envelope ensures we converge at start and end
+    const envelope = Math.sin(t * Math.PI);
+    
+    // Bias pushes the route to one side to create distinct alternatives
+    const bias = biasMultiplier * totalDist * envelope;
+    
+    // Random walk for road-like jaggedness
+    const step = (Math.random() - 0.5) * (totalDist * 0.15);
+    currentOffset += step;
+    
+    // Clamp offset to prevent wildly erratic paths
+    const maxOffset = maxDeviation * totalDist;
+    if (currentOffset > maxOffset) currentOffset = maxOffset;
+    if (currentOffset < -maxOffset) currentOffset = -maxOffset;
+    
+    const finalOffset = (currentOffset * 0.6) + bias;
+    
+    points.push([
+      baseLat + perpX * finalOffset,
+      baseLng + perpY * finalOffset
+    ]);
+  }
+  
+  points.push([end.latitude, end.longitude]);
+  return points;
+};
 
-  // Route 3: Deviation West (longer, representing an unsafe/dark road)
-  const mid2Lat = (start.latitude + end.latitude) / 2 - 0.004;
-  const mid2Lng = (start.longitude + end.longitude) / 2 - 0.004;
-  const route3Points = [
-    [start.latitude, start.longitude],
-    [mid2Lat, mid2Lng],
-    [end.latitude, end.longitude]
-  ];
+const generateMockRoutes = (start, end) => {
+  // Route 1: Fastest (mostly direct, small deviations, 10 waypoints)
+  const route1Points = generateRealisticPath(start, end, 10, 0.1, 0.05);
+  
+  // Route 2: Safe Alternative (pushes noticeably to one side, 14 waypoints)
+  const route2Points = generateRealisticPath(start, end, 14, 0.2, 0.3);
+
+  // Route 3: Longer Path (pushes to the opposite side, 18 waypoints)
+  const route3Points = generateRealisticPath(start, end, 18, 0.3, -0.4);
 
   return [
     {

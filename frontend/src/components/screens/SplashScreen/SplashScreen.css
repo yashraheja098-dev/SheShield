@@ -40,47 +40,22 @@
   text-align: center;
 }
 
-.splash-logo-container {
-  width: 120px;
-  height: 120px;
-  background: var(--glass-bg-heavy);
-  backdrop-filter: var(--glass-blur-heavy);
-  -webkit-backdrop-filter: var(--glass-blur-heavy);
-  border: 1px solid var(--glass-border);
-  border-radius: 30px;
+.splash-brand-image-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(233, 30, 140, 0.2);
-  margin-bottom: var(--sp-6);
+  width: 85vw;
+  max-width: 420px;
   opacity: 0;
   animation: fade-in-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.splash-logo {
-  color: var(--color-primary);
-  filter: drop-shadow(0 0 10px rgba(233, 30, 140, 0.6));
-}
-
-.splash-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0 0 var(--sp-4) 0;
-  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity: 0;
-  animation: fade-in-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.2s;
-}
-
-.splash-tagline {
-  font-size: var(--text-lg);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-  font-weight: var(--weight-medium);
-  opacity: 0;
-  animation: fade-in-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.4s;
+.splash-brand-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* Add a subtle glow/shadow to help it pop from the background */
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px rgba(233, 30, 140, 0.25));
 }
 
 .splash-loader {

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield } from 'lucide-react';
 import './SplashScreen.css';
+import sheShieldLogo from '../../../assets/sheshield-logo.png';
 
 const SplashScreen = () => {
   const navigate = useNavigate();
@@ -20,16 +20,12 @@ const SplashScreen = () => {
       <div className="splash-background-glow" />
       
       <div className="splash-content">
-        <div className="splash-logo-container">
-          <Shield className="splash-logo" size={64} strokeWidth={2} />
-        </div>
-        
-        <h1 className="splash-title">SheShield</h1>
-        
-        <div className="splash-tagline">
-          <div>Travel Safe.</div>
-          <div>Stay Connected.</div>
-          <div>Stay Protected.</div>
+        <div className="splash-brand-image-container">
+          <img 
+            src={sheShieldLogo} 
+            alt="SheShield Logo" 
+            className="splash-brand-image" 
+          />
         </div>
       </div>
       
