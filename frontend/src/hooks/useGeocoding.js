@@ -26,15 +26,45 @@ export const useGeocoding = () => {
   const searchPlaces = useCallback(async (query, userPosition) => {
     if (!query || !query.trim()) return [];
     
+    // Primary: Google Places Autocomplete
+    if (autocompleteService) {
+      try {
+        const request = {
+          input: query,
+          componentRestrictions: { country: 'in' },
+        };
+        
+        if (userPosition && userPosition.length === 2 && window.google) {
+          request.locationBias = new window.google.maps.Circle({
+            center: { lat: userPosition[0], lng: userPosition[1] },
+            radius: 50000, // 50km radius bias
+          });
+        }
+        
+        const response = await autocompleteService.getPlacePredictions(request);
+        
+        if (response && response.predictions) {
+          return response.predictions.map(p => ({
+            id: p.place_id,
+            name: p.structured_formatting.main_text,
+            subtitle: p.structured_formatting.secondary_text || '',
+            lat: null, // Will be fetched on select
+            lng: null,
+            type: 'place'
+          }));
+        }
+      } catch (err) {
+        console.warn('Google Autocomplete failed or returned no results, falling back to Nominatim:', err);
+      }
+    }
+
+    // Fallback: Nominatim OpenStreetMap search
     try {
-      // Fallback to free Nominatim OpenStreetMap search since Google Places requires billing
       let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`;
       
-      // Add optional location bias if userPosition is available (approximate bounding box)
       if (userPosition && userPosition.length === 2) {
         const lat = userPosition[0];
         const lng = userPosition[1];
-        // 0.2 degrees is roughly 22km
         url += `&viewbox=${lng - 0.2},${lat + 0.2},${lng + 0.2},${lat - 0.2}&bounded=0`;
       }
       

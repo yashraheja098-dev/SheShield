@@ -139,6 +139,20 @@ const SearchBar = () => {
   const handleSelect = async (item) => {
     let selectedItem = item;
 
+    // If item doesn't have lat/lng (came from Google Autocomplete), fetch details
+    if (selectedItem.lat === null || selectedItem.lng === null) {
+      setIsLoading(true);
+      const details = await getPlaceDetails(selectedItem.id);
+      setIsLoading(false);
+      
+      if (details) {
+        selectedItem = { ...selectedItem, lat: details.lat, lng: details.lng };
+      } else {
+        console.error("Failed to fetch place details for", selectedItem.name);
+        return; // Don't proceed if we can't get coordinates
+      }
+    }
+
     if (focusedField === 'pickup') {
       setPickupQuery(selectedItem.name);
       setHasUserEditedPickup(true);
