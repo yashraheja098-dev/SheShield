@@ -117,24 +117,6 @@ const SafePointsLayer = () => {
     }
   }, [userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
 
-  // Auto-adjust map bounds when points are filtered
-  useEffect(() => {
-    if (isSafePointsVisible && filteredPoints.length > 0 && userPosition && map) {
-      const bounds = new window.google.maps.LatLngBounds();
-      if (Number.isFinite(userPosition[0]) && Number.isFinite(userPosition[1])) {
-        bounds.extend({ lat: userPosition[0], lng: userPosition[1] });
-      }
-      filteredPoints.forEach(p => {
-        if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) {
-          bounds.extend({ lat: p.lat, lng: p.lng });
-        }
-      });
-      
-      map.fitBounds(bounds, {
-        padding: { top: 50, right: 50, bottom: 50, left: 50 }
-      });
-    }
-  }, [isSafePointsVisible, filteredPoints, userPosition, map]);
 
   if (!isSafePointsVisible || !filteredPoints || filteredPoints.length === 0) return null;
 

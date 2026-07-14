@@ -103,24 +103,39 @@ const RouteLayer = () => {
     fetchRoutes();
   }, [origin, destination, setRoutes, setLoading, setError]);
 
-  // Fit map bounds to active route
+  // Fit map bounds to active route in PLANNING mode, or follow user in NAVIGATING mode
   useEffect(() => {
-    const activeRoute = appMode === APP_MODES.NAVIGATING ? activeRoutePersistent : routes[activeRouteIndex];
-    if (activeRoute && activeRoute.geometry && activeRoute.geometry.length > 0 && map) {
-      const bounds = new window.google.maps.LatLngBounds();
-      activeRoute.geometry.forEach(p => {
-        if (Number.isFinite(p[0]) && Number.isFinite(p[1])) {
-          bounds.extend({ lat: p[0], lng: p[1] });
-        }
-      });
-      
-      if (!bounds.isEmpty()) {
-        map.fitBounds(bounds, {
-          padding: { top: 100, right: 20, bottom: 300, left: 20 }
+    if (!map) return;
+
+    if (appMode === APP_MODES.NAVIGATING) {
+      // In navigating mode, do not fit bounds to the whole route.
+      // Instead, zoom in to the user's current location to start the journey!
+      const userPos = useNavigationStore.getState().userPosition;
+      if (userPos && userPos.length === 2) {
+        map.panTo({ lat: userPos[0], lng: userPos[1] });
+        map.setZoom(17); // NAVIGATION_ZOOM equivalent
+      }
+      return;
+    }
+
+    if (appMode === APP_MODES.PLANNING) {
+      const activeRoute = routes[activeRouteIndex];
+      if (activeRoute && activeRoute.geometry && activeRoute.geometry.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        activeRoute.geometry.forEach(p => {
+          if (Number.isFinite(p[0]) && Number.isFinite(p[1])) {
+            bounds.extend({ lat: p[0], lng: p[1] });
+          }
         });
+        
+        if (!bounds.isEmpty()) {
+          map.fitBounds(bounds, {
+            padding: { top: 100, right: 20, bottom: 300, left: 20 }
+          });
+        }
       }
     }
-  }, [routes, activeRouteIndex, activeRoutePersistent, map, appMode]);
+  }, [routes, activeRouteIndex, map, appMode]);
 
   const getRouteColor = (route) => {
     if (route.type === 'safe') return '#00e676'; // Emerald Green
