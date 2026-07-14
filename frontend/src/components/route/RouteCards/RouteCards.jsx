@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { formatDistance, formatDuration } from '../../../utils/formatters';
+import { haversineDistance } from '../../../utils/geoUtils';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
-import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
 import './RouteCards.css';
 
@@ -115,11 +116,15 @@ const RouteCards = () => {
   const setAppMode = useUiStore((s) => s.setAppMode);
   const setBottomSheet = useUiStore((s) => s.setBottomSheet);
 
+  const setOrigin = useRouteStore((s) => s.setOrigin);
+  const userPosition = useNavigationStore((s) => s.userPosition);
+  
   const [expandedIndex, setExpandedIndex] = useState(0);
+  const [showPickupModal, setShowPickupModal] = useState(false);
 
   const setActiveJourneyId = useNavigationStore((s) => s.setActiveJourneyId);
 
-  const handleStartNavigation = async () => {
+  const startJourney = async () => {
     const activeRoute = routes[activeRouteIndex];
     // Persist the actual route object so it survives any array resets
     setActiveRoute(activeRoute);
@@ -149,6 +154,35 @@ const RouteCards = () => {
     }
   };
 
+  const handleStartNavigation = async () => {
+    if (userPosition && origin && origin.lat && origin.lng) {
+      const dist = haversineDistance(userPosition, [origin.lat, origin.lng]);
+      if (dist > 30) {
+        setShowPickupModal(true);
+        return;
+      }
+    }
+    await startJourney();
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (userPosition) {
+      setOrigin({ lat: userPosition[0], lng: userPosition[1], name: 'Current Location' });
+    }
+    setShowPickupModal(false);
+  };
+
+  const handleNavigateToPickup = () => {
+    // Keep selected pickup, recalculate route from current GPS to selected pickup
+    if (userPosition && origin) {
+      // The current origin becomes the destination
+      useRouteStore.getState().setDestination(origin);
+      // The user's live GPS becomes the new origin
+      setOrigin({ lat: userPosition[0], lng: userPosition[1], name: 'Current Location' });
+    }
+    setShowPickupModal(false);
+  };
+
   if (isLoading) {
     return (
       <div className="route-cards-container loading">
@@ -169,22 +203,52 @@ const RouteCards = () => {
   if (!routes || routes.length === 0) return null;
 
   return (
-    <div className="route-cards-container">
-      {routes.map((route, index) => (
-        <RouteCard 
-          key={route.id}
-          route={route}
-          isActive={index === activeRouteIndex}
-          isExpanded={index === expandedIndex}
-          onToggleExpand={(e) => {
-            e.stopPropagation();
-            setExpandedIndex(expandedIndex === index ? null : index);
-          }}
-          onClick={() => setActiveRouteIndex(index)}
-          onStartNavigation={handleStartNavigation}
-        />
-      ))}
-    </div>
+    <>
+      <div className="route-cards-container">
+        {routes.map((route, index) => (
+          <RouteCard 
+            key={route.id}
+            route={route}
+            isActive={index === activeRouteIndex}
+            isExpanded={index === expandedIndex}
+            onToggleExpand={(e) => {
+              e.stopPropagation();
+              setExpandedIndex(expandedIndex === index ? null : index);
+            }}
+            onClick={() => setActiveRouteIndex(index)}
+            onStartNavigation={handleStartNavigation}
+          />
+        ))}
+      </div>
+
+      {showPickupModal && (
+        <div className="alert-modal-overlay anim-fade-in" style={{ zIndex: 9999 }}>
+          <div className="alert-modal-card anim-slide-up">
+            <div className="alert-modal-icon">
+              <AlertTriangle size={32} color="#ff3b30" />
+            </div>
+            <h2 className="alert-modal-title">You're not at the pickup location</h2>
+            <p className="alert-modal-message">You selected a pickup point different from your current location.</p>
+            <div className="alert-modal-actions" style={{ flexDirection: 'column', gap: '10px' }}>
+              <button 
+                className="alert-btn alert-btn-return" 
+                style={{ width: '100%' }}
+                onClick={handleUseCurrentLocation}
+              >
+                Use Current Location
+              </button>
+              <button 
+                className="alert-btn alert-btn-safe" 
+                style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid #333', color: '#fff' }}
+                onClick={handleNavigateToPickup}
+              >
+                Navigate to Pickup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

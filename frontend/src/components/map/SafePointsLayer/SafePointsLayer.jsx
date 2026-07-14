@@ -54,6 +54,10 @@ const SafePointsLayer = () => {
       return;
     }
 
+    // Remove previous route completely
+    useRouteStore.getState().setRoutes([]);
+    useRouteStore.getState().setActiveRoute(null);
+
     // Set origin to current user position
     setOrigin({
       lat: userPosition[0],
@@ -71,8 +75,14 @@ const SafePointsLayer = () => {
       type: point.type || 'place'
     });
 
-    setAppMode(APP_MODES.PLANNING);
-    setBottomSheet(SHEET_STATES.HALF);
+    const isNavigating = useUiStore.getState().appMode === APP_MODES.NAVIGATING;
+    if (isNavigating) {
+      // Continue navigating to the new Safe Point. Do NOT return to planning mode.
+      setBottomSheet(SHEET_STATES.HIDDEN);
+    } else {
+      setAppMode(APP_MODES.PLANNING);
+      setBottomSheet(SHEET_STATES.HALF);
+    }
   }, [userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
 
   // Auto-adjust map bounds when points are filtered
