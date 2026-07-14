@@ -36,52 +36,84 @@ const SafePointsLayer = () => {
     return safePoints.filter(p => p.type === activeFilter);
   }, [safePoints, activeFilter]);
 
-  const handleNavigate = useCallback((point) => {
+  const handleNavigate = useCallback(async (point) => {
     setActivePopupId(null); // Close popup
 
-    // 1. Verify user position exists to set origin
     if (!userPosition || userPosition.length !== 2) {
-      console.error('Routing cannot start: Valid userPosition is missing from navigationStore.', userPosition);
+      console.error('Routing cannot start: Valid userPosition is missing.');
       return;
     }
 
-    // 2. Verify latitude and longitude are valid finite numbers
     const destLat = parseFloat(point.lat);
     const destLng = parseFloat(point.lng);
 
     if (!Number.isFinite(destLat) || !Number.isFinite(destLng)) {
-      console.error('Routing cannot start: Safe Point coordinates are not valid finite numbers.', point);
+      console.error('Routing cannot start: Invalid Safe Point coordinates.');
       return;
     }
 
-    // Remove previous route completely
-    useRouteStore.getState().setRoutes([]);
-    useRouteStore.getState().setActiveRoute(null);
-
-    // Set origin to current user position
-    setOrigin({
-      lat: userPosition[0],
-      lng: userPosition[1],
-      name: 'My Location'
-    });
-
-    // 3. Normalize every Safe Point into exactly the same destination structure used by destination search
-    setDestination({
+    // Set origin and destination visually
+    const originObj = { lat: userPosition[0], lng: userPosition[1], name: 'My Location' };
+    const destObj = {
       id: String(point.id),
       name: String(point.name || 'Safe Point'),
       subtitle: String(point.address || point.subtitle || 'Safe Point Location'),
       lat: destLat,
       lng: destLng,
       type: point.type || 'place'
-    });
+    };
 
-    const isNavigating = useUiStore.getState().appMode === APP_MODES.NAVIGATING;
-    if (isNavigating) {
-      // Continue navigating to the new Safe Point. Do NOT return to planning mode.
-      setBottomSheet(SHEET_STATES.HIDDEN);
-    } else {
-      setAppMode(APP_MODES.PLANNING);
-      setBottomSheet(SHEET_STATES.HALF);
+    setOrigin(originObj);
+    setDestination(destObj);
+
+    // Show loading indicator implicitly by moving to NAVIGATING mode
+    // The route store will handle loading state if needed
+    useUiStore.getState().setAppMode(APP_MODES.NAVIGATING);
+    setBottomSheet(SHEET_STATES.HIDDEN);
+
+    try {
+      useUiStore.getState().pushToast({ type: 'info', message: 'Calculating fastest safe route...' });
+      
+      const { routingApi } = await import('../../../services/api/routingApi');
+      const axiosInstance = (await import('../../../services/api/axiosInstance')).default;
+      
+      const fetchedRoutes = await routingApi.getSafeRoutes(originObj, destObj);
+      
+      if (fetchedRoutes && fetchedRoutes.length > 0) {
+        // Assume first is best for safe point
+        const activeRoute = fetchedRoutes[0];
+        
+        useRouteStore.getState().setRoutes(fetchedRoutes);
+        useRouteStore.getState().setActiveRouteIndex(0);
+        useRouteStore.getState().setActiveRoute(activeRoute);
+
+        // Start Journey on backend silently
+        try {
+          const res = await axiosInstance.post('/journey/start', {
+            origin:      originObj.name,
+            destination: destObj.name,
+            selectedRoute: {
+              distance:    activeRoute.distance,
+              duration:    String(activeRoute.duration) + 's',
+              polyline:    activeRoute.polyline || 'frontend_simulated_polyline',
+              safetyScore: activeRoute.safetyScore,
+              riskLevel:   activeRoute.riskLevel || 'Unknown',
+              coordinates: activeRoute.geometry || [],
+            },
+          });
+          if (res.data?.journey?._id) {
+            useNavigationStore.getState().setActiveJourneyId(res.data.journey._id);
+          }
+        } catch (journeyErr) {
+          console.error('Journey start logging failed:', journeyErr);
+        }
+      } else {
+        throw new Error('No routes found.');
+      }
+    } catch (err) {
+      console.error('Failed to auto-fetch route to safe point:', err);
+      useUiStore.getState().pushToast({ type: 'error', message: 'Failed to calculate route.' });
+      setAppMode(APP_MODES.IDLE);
     }
   }, [userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
 

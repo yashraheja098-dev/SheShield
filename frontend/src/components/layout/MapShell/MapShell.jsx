@@ -23,6 +23,7 @@ import ReportModal     from '../../report/ReportModal/ReportModal';
 import LiveReportsFeed from '../../report/LiveReportsFeed/LiveReportsFeed';
 import EmergencyContactsButton from '../../contacts/EmergencyContactsButton/EmergencyContactsButton';
 import EmergencyContactsModal from '../../contacts/EmergencyContactsModal/EmergencyContactsModal';
+import FindSafeSpotButton from '../../safety/FindSafeSpotButton/FindSafeSpotButton';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -195,6 +196,11 @@ const MapShell = () => {
       {/* ── Layer 2.8: Report Incident (z-index: 910) ── */}
       <div className="layer layer--report">
         <ReportButton />
+      </div>
+
+      {/* ── Layer 2.9: Find Safe Spot FAB (z-index: 998) ── */}
+      <div className="layer layer--safe-spot">
+        <FindSafeSpotButton />
       </div>
 
       {/* ── Layer 3: SOS FAB (z-index: 999) ── */}
