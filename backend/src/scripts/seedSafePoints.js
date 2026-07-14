@@ -23,88 +23,60 @@ const seedSafePoints = async () => {
 
     const demoPoints = [
       {
-        name: 'Cyber City Police Station',
-        latitude: 28.4950,
-        longitude: 77.0890,
+        name: 'Kesrisinghpur City Police Station',
+        latitude: 29.9480,
+        longitude: 73.6220,
         category: 'Police Station',
         openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6220, 29.9480] }
       },
       {
-        name: 'Fortis Memorial Research Institute',
-        latitude: 28.4595,
-        longitude: 77.0725,
+        name: 'Government Hospital Kesrisinghpur',
+        latitude: 29.9450,
+        longitude: 73.6200,
         category: 'Hospital',
         openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6200, 29.9450] }
       },
       {
-        name: 'HUDA City Centre Metro',
-        latitude: 28.4593,
-        longitude: 77.0724,
-        category: 'Metro Station',
-        openStatus: 'Closes at 11:30 PM',
-      },
-      {
-        name: 'Apollo Pharmacy 24/7',
-        latitude: 28.4650,
-        longitude: 77.0600,
-        category: 'Pharmacy',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'Women Help Centre - Galleria',
-        latitude: 28.4710,
-        longitude: 77.0805,
-        category: 'Women Help Centre',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'MG Road Metro Station',
-        latitude: 28.4800,
-        longitude: 77.0800,
-        category: 'Metro Station',
-        openStatus: 'Closes at 11:30 PM',
-      },
-      {
-        name: 'Medanta - The Medicity',
-        latitude: 28.4385,
-        longitude: 77.0425,
-        category: 'Hospital',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'Sushant Lok Police Station',
-        latitude: 28.4500,
-        longitude: 77.0750,
-        category: 'Police Station',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'Connaught Place Police Post',
-        latitude: 28.6304,
-        longitude: 77.2177,
-        category: 'Police Station',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'Safdarjung Hospital',
-        latitude: 28.5685,
-        longitude: 77.2062,
-        category: 'Hospital',
-        openStatus: 'Open 24/7',
-      },
-      {
-        name: 'Rajiv Chowk Metro',
-        latitude: 28.6328,
-        longitude: 77.2197,
-        category: 'Metro Station',
-        openStatus: 'Closes at 11:30 PM',
-      },
-      {
-        name: 'New Delhi Railway Station',
-        latitude: 28.6429,
-        longitude: 77.2212,
+        name: 'Kesrisinghpur Railway Station',
+        latitude: 29.9500,
+        longitude: 73.6250,
         category: 'Railway Station',
         openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6250, 29.9500] }
+      },
+      {
+        name: 'Local Pharmacy 24/7',
+        latitude: 29.9470,
+        longitude: 73.6230,
+        category: 'Pharmacy',
+        openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6230, 29.9470] }
+      },
+      {
+        name: 'Women Help Centre',
+        latitude: 29.9460,
+        longitude: 73.6210,
+        category: 'Women Help Centre',
+        openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6210, 29.9460] }
+      },
+      {
+        name: 'Indian Oil Petrol Pump',
+        latitude: 29.9420,
+        longitude: 73.6180,
+        category: 'Petrol Pump',
+        openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6180, 29.9420] }
+      },
+      {
+        name: 'Highway Hotel & Rest',
+        latitude: 29.9400,
+        longitude: 73.6150,
+        category: 'Hotel',
+        openStatus: 'Open 24/7',
+        location: { type: "Point", coordinates: [73.6150, 29.9400] }
       }
     ];
 
