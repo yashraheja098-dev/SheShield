@@ -53,17 +53,18 @@
 }
 
 .login-logo-container {
-  width: 64px;
-  height: 64px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--glass-border-strong);
-  border-radius: var(--r-lg);
+  width: auto;
+  height: 118px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
-  margin-bottom: var(--sp-2);
-  box-shadow: 0 4px 15px rgba(233, 30, 140, 0.2);
+  margin-bottom: 8px;
+}
+
+.login-brand-image {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
 }
 
 .login-title {

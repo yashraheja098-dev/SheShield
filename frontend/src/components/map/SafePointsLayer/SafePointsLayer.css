@@ -58,10 +58,34 @@
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
   border: 1px solid var(--glass-border);
-  border-radius: var(--r-lg);
-  color: var(--color-text-primary);
-  padding: 0;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  border-radius: 16px;
+  padding: 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  max-width: 250px !important;
+  overflow: visible !important;
+}
+
+.sp-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.sp-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .safe-point-popup .gm-style-iw-tc::after {
@@ -84,6 +108,7 @@
 .safe-point-popup-content {
   padding: var(--sp-4);
   padding-right: var(--sp-6); /* Make room for the close button */
+  padding-top: var(--sp-6); /* Added room for close button */
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);

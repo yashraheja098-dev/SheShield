@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Shield, Eye, EyeOff } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
 import useUserStore from '../../../stores/userStore';
+import sheShieldLogo from '../../../assets/sheshield-logo.png';
 import './LoginScreen.css';
 
 const LoginScreen = () => {
@@ -99,7 +100,7 @@ const LoginScreen = () => {
         {/* Header */}
         <div className="login-header">
           <div className="login-logo-container">
-            <Shield size={36} strokeWidth={2.5} />
+            <img src={sheShieldLogo} alt="SheShield Logo" className="login-brand-image" />
           </div>
           <h1 className="login-title">{isRegistering ? 'Create Account' : 'Welcome Back'}</h1>
           <p className="login-subtitle">

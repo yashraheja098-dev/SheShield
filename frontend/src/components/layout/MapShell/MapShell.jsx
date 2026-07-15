@@ -8,6 +8,7 @@
  *   3. Remains a pure layout component — no business logic here.
  */
 import { useEffect } from 'react';
+import { Shield } from 'lucide-react';
 import { haversineDistance } from '../../../utils/geoUtils';
 
 import MapContainer    from '../../map/MapContainer/MapContainer';
@@ -167,7 +168,7 @@ const MapShell = () => {
         <div className="top-controls-wrap">
           {/* App brand */}
           <div className="app-brand" aria-label="SheShield">
-            <span className="app-brand-shield" aria-hidden="true">🛡️</span>
+            <Shield size={24} color="#ff2d55" className="app-brand-icon" />
             <span className="app-brand-name">SheShield</span>
           </div>
 

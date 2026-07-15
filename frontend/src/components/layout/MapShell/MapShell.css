@@ -80,9 +80,7 @@
   animation: anim-slide-down var(--transition-slow) both;
 }
 
-.app-brand-shield {
-  font-size: 16px;
-  line-height: 1;
+.app-brand-icon {
   filter: drop-shadow(0 0 6px rgba(233, 30, 140, 0.6));
 }
 

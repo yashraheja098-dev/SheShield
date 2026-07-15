@@ -8,6 +8,13 @@ import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
 import './RouteCards.css';
+const getSafetyLabel = (score) => {
+  if (score >= 90) return 'Very Safe 🟢';
+  if (score >= 70) return 'Safe 🟢';
+  if (score >= 50) return 'Moderate 🟡';
+  if (score >= 30) return 'Risky 🟠';
+  return 'Dangerous 🔴';
+};
 
 const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation }) => {
   const [isSafetyExpanded, setIsSafetyExpanded] = useState(false);
@@ -65,7 +72,7 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
               <div className="route-card-score-badge">
                 <Icon size={16} />
                 <span>{route.safetyScore}/100 Safety</span>
-                <span className="route-card-risk">({route.riskLevel || 'Unknown'})</span>
+                <span className="route-card-risk">({getSafetyLabel(route.safetyScore)})</span>
               </div>
               {route.warnings && route.warnings.length > 0 && (
                 <button className="route-card-expand-btn" onClick={(e) => {

@@ -2,8 +2,8 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--color-text-primary);
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@
 
 @media (min-width: 768px) {
   .emergency-contacts-btn {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
   }
 }

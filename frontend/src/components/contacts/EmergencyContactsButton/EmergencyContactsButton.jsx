@@ -13,7 +13,7 @@ const EmergencyContactsButton = () => {
       aria-label="Manage Emergency Contacts"
       title="Emergency Contacts"
     >
-      <Users size={20} />
+      <Users size={24} />
     </button>
   );
 };

@@ -27,6 +27,7 @@ const SplashScreen = () => {
             className="splash-brand-image" 
           />
         </div>
+        <p className="splash-tagline">Navigate Safer. Stay Connected.</p>
       </div>
       
       <div className="splash-loader" />
