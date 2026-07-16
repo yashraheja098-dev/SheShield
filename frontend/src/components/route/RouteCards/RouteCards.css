@@ -153,6 +153,7 @@
   gap: var(--sp-2);
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
+  white-space: nowrap;
 }
 
 .score-safe {
@@ -171,7 +172,11 @@
 }
 
 .route-card-risk {
-  display: none;
+  display: inline;
+  font-weight: var(--weight-medium);
+  opacity: 0.8;
+  font-size: 13px; /* Slightly smaller for mobile */
+  margin-left: var(--sp-1);
 }
 
 
@@ -231,6 +236,15 @@
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .route-card-score-badge {
+    font-size: 13px;
+  }
+  .route-card-risk {
+    font-size: 12px;
   }
 }
 

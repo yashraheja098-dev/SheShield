@@ -4,185 +4,184 @@
 }
 
 .safe-point-marker {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 2px solid white;
-  transition: transform 0.2s;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .safe-point-marker:hover {
   transform: scale(1.1);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .safe-point-marker svg {
   width: 20px;
   height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
 }
 
 /* Colors by type */
 .marker-police {
-  background: #1e88e5;
+  background: linear-gradient(135deg, #42a5f5, #1565c0);
 }
 
 .marker-hospital {
-  background: #e53935;
+  background: linear-gradient(135deg, #ef5350, #c62828);
 }
 
 .marker-metro {
-  background: #fdd835;
+  background: linear-gradient(135deg, #ffee58, #f57f17);
   color: #333;
-  border-color: #333;
+}
+.marker-metro svg {
+  filter: drop-shadow(0 1px 1px rgba(255,255,255,0.5));
 }
 
 .marker-pharmacy {
-  background: #43a047;
+  background: linear-gradient(135deg, #66bb6a, #2e7d32);
 }
 
 .marker-womens_desk {
-  background: #d81b60;
+  background: linear-gradient(135deg, #ec407a, #ad1457);
+}
+
+.marker-petrol_pump {
+  background: linear-gradient(135deg, #ffa726, #e65100);
+}
+
+.marker-emergency {
+  background: linear-gradient(135deg, #ef5350, #b71c1c);
 }
 
 .marker-default {
-  background: #8e24aa;
+  background: linear-gradient(135deg, #ab47bc, #6a1b9a);
 }
 
 /* Popup Styling for Google Maps InfoWindow */
 .safe-point-popup .gm-style-iw-c {
-  background: var(--glass-bg-heavy);
-  backdrop-filter: var(--glass-blur-heavy);
-  -webkit-backdrop-filter: var(--glass-blur-heavy);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  background: #ffffff !important;
+  border-radius: 16px !important;
   padding: 0 !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  max-width: 250px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  max-width: 280px !important;
   overflow: visible !important;
 }
 
 .sp-close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  top: 12px;
+  right: 12px;
+  background: #f0f0f0;
+  border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #333333;
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 10;
 }
 
 .sp-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
+  background: #e0e0e0;
 }
 
 .safe-point-popup .gm-style-iw-tc::after {
-  background: var(--glass-bg-heavy);
-  border: 1px solid var(--glass-border);
+  background: #ffffff !important;
 }
 
 .safe-point-popup .gm-ui-hover-effect {
-  top: 8px !important;
-  right: 8px !important;
-  background: var(--glass-bg) !important;
-  border-radius: 50% !important;
-  border: 1px solid var(--glass-border) !important;
-}
-
-.safe-point-popup .gm-ui-hover-effect span {
-  background-color: var(--color-text-primary) !important;
+  display: none !important; /* Hide default Google close button completely */
 }
 
 .safe-point-popup-content {
-  padding: var(--sp-4);
-  padding-right: var(--sp-6); /* Make room for the close button */
-  padding-top: var(--sp-6); /* Added room for close button */
+  padding: 20px 24px;
+  padding-right: 48px; /* Room for close btn */
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
 }
 
 .safe-point-popup-content h3 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--sp-1) 0;
-  line-height: var(--leading-tight);
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
 }
 
 .sp-header-row {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  margin: 0 0 var(--sp-1) 0;
+  gap: 8px;
+  margin: 0 0 12px 0;
 }
 
 .sp-type {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
+  font-size: 12px;
+  font-weight: 700;
   color: var(--color-primary);
   margin: 0;
 }
 
 .sp-badge-24h {
-  font-size: 10px;
-  font-weight: var(--weight-bold);
-  background: var(--color-safe-alpha);
-  color: var(--color-safe);
-  padding: 2px 6px;
-  border-radius: var(--r-sm);
-  border: 1px solid rgba(0, 230, 118, 0.25);
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 230, 118, 0.15);
+  color: #00a651;
+  padding: 2px 8px;
+  border-radius: 4px;
   white-space: nowrap;
 }
 
 .sp-distance {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-medium);
-  margin: 0 0 var(--sp-2) 0;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+  font-weight: 500;
 }
 
 .sp-address {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  line-height: var(--leading-snug);
-  margin: 0 0 var(--sp-3) 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
 }
 
 .sp-navigate-btn {
-  margin-top: var(--sp-3);
+  margin-top: auto;
+  width: 100%;
   background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: var(--r-md);
-  padding: var(--sp-2);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-2);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
+  gap: 8px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(233, 30, 140, 0.3);
 }
 
 .sp-navigate-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(233, 30, 140, 0.4);
+  opacity: 0.9;
 }

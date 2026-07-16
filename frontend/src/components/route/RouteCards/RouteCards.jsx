@@ -72,7 +72,7 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
               <div className="route-card-score-badge">
                 <Icon size={16} />
                 <span>{route.safetyScore}/100 Safety</span>
-                <span className="route-card-risk">({getSafetyLabel(route.safetyScore)})</span>
+                <span className="route-card-risk">{getSafetyLabel(route.safetyScore)}</span>
               </div>
               {route.warnings && route.warnings.length > 0 && (
                 <button className="route-card-expand-btn" onClick={(e) => {

@@ -1,8 +1,8 @@
 /**
- * SOSButton — Pulsing emergency FAB + 5-second countdown overlay.
+ * SOSButton — Pulsing emergency FAB + 3-second countdown overlay.
  *
  * Interaction flow:
- *   Tap → countdown starts (5 → 0)
+ *   Tap → countdown starts (3 → 0)
  *   During countdown: tap again OR tap CANCEL → abort
  *   Countdown reaches 0 → SOS activates → backend notified
  */
@@ -35,7 +35,7 @@ const SOSCountdown = ({ countdown, onCancel, onActivateNow }) => (
             cx="50" cy="50" r="45"
             fill="none" strokeWidth="6"
             strokeDasharray="283"
-            strokeDashoffset={283 - (283 * (5 - countdown)) / 5}
+            strokeDashoffset={283 - (283 * (3 - countdown)) / 3}
           />
         </svg>
         <span className="sos-ring-number">{countdown}</span>
@@ -177,6 +177,7 @@ const SOSButton = () => {
   const {
     isActive,
     isCountingDown,
+    isConfirmationReady,
     countdown,
     activeSosId,
     contactsAlerted,
@@ -184,6 +185,7 @@ const SOSButton = () => {
     beginCountdown,
     cancelCountdown,
     activateSOSNow,
+    confirmActivation,
     resolveEmergency,
     setActiveSosId,
     alertContacts,
@@ -276,6 +278,35 @@ const SOSButton = () => {
         />
       )}
 
+      {/* Confirmation modal */}
+      {isConfirmationReady && (
+        <div className="sos-overlay" role="alertdialog" aria-modal="true">
+          <div className="sos-overlay-card anim-scale-in-spring">
+            <div className="sos-ring-container" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AlertTriangle size={48} color="#e91e63" />
+            </div>
+            <p className="sos-overlay-title">Emergency Alert Ready</p>
+            <p className="sos-overlay-subtitle">
+              The countdown has finished.<br />Do you want to send the SOS alert now?
+            </p>
+            <div className="sos-countdown-actions">
+              <button
+                className="sos-cancel-btn"
+                onClick={cancelCountdown}
+              >
+                Cancel
+              </button>
+              <button
+                className="sos-activate-now-btn"
+                onClick={confirmActivation}
+              >
+                Activate Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Active SOS compact panel overlay */}
       {isActive && (
         <SOSActiveScreen 
@@ -288,8 +319,8 @@ const SOSButton = () => {
         />
       )}
 
-      {/* FAB — always visible unless SOS is active */}
-      {!isActive && (
+      {/* FAB — always visible unless SOS is active or confirming */}
+      {!isActive && !isConfirmationReady && (
         <button
           id="sos-fab"
           className={`sos-fab ${isCountingDown ? 'counting' : ''}`}

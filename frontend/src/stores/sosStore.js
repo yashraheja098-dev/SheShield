@@ -2,8 +2,8 @@
  * sosStore — SOS emergency state machine.
  *
  * Flow:
- *   User taps SOS → beginCountdown() → 5-second countdown
- *   → if not cancelled → activateSOS() → contacts alerted
+ *   User taps SOS → beginCountdown() → 3-second countdown
+ *   → if not cancelled → show confirmation modal
  *   → resolveEmergency() resets all state
  */
 import { create } from 'zustand';
@@ -12,13 +12,14 @@ const useSosStore = create((set, get) => ({
   /* ── State ── */
   isActive:         false,
   isCountingDown:   false,
-  countdown:        5,
+  isConfirmationReady: false,
+  countdown:        3,
   contactsAlerted:  [],
   triggeredAt:      null,
   activeSosId:      null,   /* backend SOSLog._id — stored for resolve call */
   _timerId:         null,   /* internal — do not read directly */
 
-  /* ── Begin countdown (5 → 0, then auto-trigger) ── */
+  /* ── Begin countdown (3 → 0, then wait for confirmation) ── */
   beginCountdown: () => {
     const { _timerId } = get();
     if (_timerId) clearInterval(_timerId); // Guard: no double timers
@@ -29,9 +30,8 @@ const useSosStore = create((set, get) => ({
         clearInterval(get()._timerId);
         set({
           isCountingDown: false,
-          isActive:       true,
-          countdown:      5,
-          triggeredAt:    Date.now(),
+          isConfirmationReady: true,
+          countdown:      3,
           _timerId:       null,
         });
       } else {
@@ -39,7 +39,17 @@ const useSosStore = create((set, get) => ({
       }
     }, 1000);
 
-    set({ isCountingDown: true, countdown: 5, _timerId: id });
+    set({ isCountingDown: true, countdown: 3, _timerId: id });
+  },
+
+  /* ── Confirm activation from the modal ── */
+  confirmActivation: () => {
+    set({
+      isConfirmationReady: false,
+      isActive:       true,
+      countdown:      3,
+      triggeredAt:    Date.now(),
+    });
   },
 
   /* ── Immediately trigger SOS without waiting ── */
@@ -48,8 +58,9 @@ const useSosStore = create((set, get) => ({
     if (_timerId) clearInterval(_timerId);
     set({
       isCountingDown: false,
+      isConfirmationReady: false,
       isActive:       true,
-      countdown:      5,
+      countdown:      3,
       triggeredAt:    Date.now(),
       _timerId:       null,
     });
@@ -59,7 +70,7 @@ const useSosStore = create((set, get) => ({
   cancelCountdown: () => {
     const { _timerId } = get();
     if (_timerId) clearInterval(_timerId);
-    set({ isCountingDown: false, countdown: 5, _timerId: null });
+    set({ isCountingDown: false, isConfirmationReady: false, countdown: 3, _timerId: null });
   },
 
   /* ── Mark contacts as alerted ── */
@@ -75,7 +86,8 @@ const useSosStore = create((set, get) => ({
     set({
       isActive:        false,
       isCountingDown:  false,
-      countdown:       5,
+      isConfirmationReady: false,
+      countdown:       3,
       contactsAlerted: [],
       triggeredAt:     null,
       activeSosId:     null,
