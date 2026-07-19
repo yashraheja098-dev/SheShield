@@ -17,7 +17,7 @@ const LocationPermissionScreen = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         // Permission granted
-        navigate('/map');
+        navigate('/app/navigation');
       },
       (error) => {
         // Permission denied or error
@@ -32,7 +32,7 @@ const LocationPermissionScreen = () => {
   };
 
   const handleSkip = () => {
-    navigate('/map');
+    navigate('/app/navigation');
   };
 
   return (

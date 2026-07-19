@@ -1,0 +1,68 @@
+/* ══════════════════════════════════════
+   PlaceholderPage — Upcoming-feature screen
+   Uses SheShield design tokens.
+   ══════════════════════════════════════ */
+
+.placeholder-page {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
+  background: var(--color-bg);
+}
+
+.placeholder-page__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  max-width: 320px;
+  text-align: center;
+
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-10) var(--sp-8);
+  box-shadow: var(--shadow-lg);
+  animation: anim-scale-in-spring 0.5s both;
+}
+
+/* Icon wrapper with soft glow */
+.placeholder-page__icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--icon-color, var(--color-primary)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--icon-color, var(--color-primary)) 30%, transparent);
+  color: var(--icon-color, var(--color-primary));
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--icon-color, var(--color-primary)) 40%, transparent));
+}
+
+.placeholder-page__title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+  margin: 0;
+  /* Pink gradient matching the SheShield brand */
+  background: linear-gradient(120deg, #E91E8C 0%, #F48FB1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.placeholder-page__subtitle {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}

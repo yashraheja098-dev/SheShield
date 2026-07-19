@@ -1,0 +1,105 @@
+/* ══════════════════════════════════════════════
+   BottomNavBar — SheShield persistent nav
+   Uses existing design tokens exclusively.
+   ══════════════════════════════════════════════ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height, 60px);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border-top: 1px solid var(--glass-border-strong);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+
+  z-index: var(--z-sheet); /* 300 — above map, below modals */
+
+  /* Respect iPhone home indicator */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Individual tab item ── */
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-decoration: none;
+  position: relative;
+  color: var(--color-text-muted);
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.bottom-nav__item:active {
+  transform: scale(0.92);
+}
+
+/* ── Icon ── */
+.bottom-nav__icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+  transition: 
+    color var(--transition-fast),
+    filter var(--transition-fast),
+    transform var(--transition-base);
+}
+
+/* ── Label ── */
+.bottom-nav__label {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+/* ── Active pill indicator ── */
+.bottom-nav__indicator {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 28px;
+  height: 3px;
+  border-radius: var(--r-full);
+  background: var(--color-primary);
+  transition: transform var(--transition-spring);
+}
+
+/* ══ Active state ══ */
+.bottom-nav__item--active {
+  color: var(--color-primary);
+}
+
+.bottom-nav__item--active .bottom-nav__icon {
+  filter: drop-shadow(0 0 6px var(--color-primary-glow));
+  transform: translateY(-2px);
+}
+
+.bottom-nav__item--active .bottom-nav__indicator {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ══ Navigation tab special glow ══ */
+.bottom-nav__item[href="/app/navigation"].bottom-nav__item--active .bottom-nav__icon,
+.bottom-nav__item[aria-label="Navigation"].bottom-nav__item--active .bottom-nav__icon {
+  filter: drop-shadow(0 0 8px var(--color-primary-glow));
+}

@@ -1,0 +1,34 @@
+/* ══════════════════════════════════
+   AppShell — Root layout container
+   ══════════════════════════════════ */
+
+.app-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+
+  /* Expose nav height as a token for children to consume */
+  --bottom-nav-height: 60px;
+}
+
+.app-shell__content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+
+  /*
+   * Push content up so nothing hides behind the BottomNavBar.
+   * MapShell is position:fixed and manages its own insets;
+   * it reads --bottom-nav-height via CSS cascade.
+   */
+  padding-bottom: var(--bottom-nav-height);
+}
+
+/* On iOS, the safe area adds to the nav height */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .app-shell {
+    --bottom-nav-height: calc(60px + env(safe-area-inset-bottom));
+  }
+}

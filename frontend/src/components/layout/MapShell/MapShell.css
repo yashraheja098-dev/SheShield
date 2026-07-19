@@ -11,7 +11,10 @@
   background: var(--color-bg);
 
   /* Dynamic mobile bottom sheet height tracking */
-  --mobile-sheet-height: 140px; 
+  --mobile-sheet-height: 140px;
+
+  /* Nav bar offset (provided by AppShell; falls back to 0 if MapShell is used standalone) */
+  --nav-offset: var(--bottom-nav-height, 0px);
 }
 
 /* When route cards are active, the sheet expands */
@@ -98,7 +101,7 @@
 /* ══ Layer 2: Map Controls ══ */
 .layer--controls {
   right: var(--sp-3);
-  bottom: calc(var(--mobile-sheet-height) + 75px);  /* compact spacing above SOS */
+  bottom: calc(var(--mobile-sheet-height) + var(--nav-offset) + 75px);
   z-index: var(--z-controls);
   pointer-events: all;
   animation: anim-fade-in 0.6s 0.3s both;
@@ -108,7 +111,7 @@
 /* ══ Layer 3: SOS FAB ══ */
 .layer--sos {
   right: var(--sp-3);
-  bottom: calc(var(--mobile-sheet-height) + 12px);
+  bottom: calc(var(--mobile-sheet-height) + var(--nav-offset) + 12px);
   z-index: var(--z-sos);
   pointer-events: all;
   animation: anim-scale-in-spring 0.5s 0.4s both;
@@ -119,7 +122,7 @@
 .layer--alert {
   left: var(--sp-3);
   right: auto;
-  bottom: calc(var(--mobile-sheet-height) + 12px);
+  bottom: calc(var(--mobile-sheet-height) + var(--nav-offset) + 12px);
   z-index: 900;
   pointer-events: all;
   transition: bottom 0.3s ease;
@@ -129,7 +132,7 @@
 .layer--report {
   left: var(--sp-3);
   right: auto;
-  bottom: calc(var(--mobile-sheet-height) + 60px);
+  bottom: calc(var(--mobile-sheet-height) + var(--nav-offset) + 60px);
   z-index: 910;
   pointer-events: all;
   transition: bottom 0.3s ease;
@@ -139,7 +142,7 @@
 .layer--bottom {
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--nav-offset);
   z-index: var(--z-sheet);
   pointer-events: all;
 }
