@@ -4,15 +4,15 @@
  */
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Map, Shield, Users, User } from 'lucide-react';
+import { Home, Map, Shield, DoorOpen, User } from 'lucide-react';
 import './BottomNavBar.css';
 
 const TABS = [
-  { to: '/app/home',       icon: Home,   label: 'Home' },
-  { to: '/app/navigation', icon: Map,    label: 'Navigation' },
-  { to: '/app/safety',     icon: Shield, label: 'Safety Hub' },
-  { to: '/app/community',  icon: Users,  label: 'Community' },
-  { to: '/app/profile',    icon: User,   label: 'Profile' },
+  { to: '/app/home',       icon: Home,       label: 'Home' },
+  { to: '/app/navigation', icon: Map,        label: 'Navigation' },
+  { to: '/app/safety',     icon: Shield,     label: 'Safety Hub' },
+  { to: '/app/community',  icon: DoorOpen,   label: 'Safety Rooms' },
+  { to: '/app/profile',    icon: User,       label: 'Profile' },
 ];
 
 const BottomNavBar = () => (
