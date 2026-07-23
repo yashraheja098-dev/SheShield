@@ -100,7 +100,7 @@ const CreateRoomModal = ({ onClose, onCreate }) => {
     
     setLoading(true);
     try {
-      const { data } = await roomApi.createRoom(form);
+      const data = await roomApi.createRoom(form);
       onCreate(data);
       onClose();
     } catch (error) {
@@ -275,8 +275,8 @@ const ChatSection = ({ room }) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const { data } = await roomApi.getRoomMessages(room.roomId);
-        setMessages(data);
+        const data = await roomApi.getRoomMessages(room.roomId);
+        setMessages(data || []);
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
       } catch (e) { console.error("Could not fetch messages", e); }
     };
