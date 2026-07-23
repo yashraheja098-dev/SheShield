@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ""
     },
-    trustedContacts: [
+    emergencyContacts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Contact"

@@ -149,7 +149,7 @@ const generateMockRoutes = (start, end) => {
 /**
  * Fetches multiple routes from Google Routes API.
  */
-export const getRoutes = async (origin, destination) => {
+export const getRoutes = async (origin, destination, travelMode = "WALK") => {
   const start = await geocodeAddress(origin);
   const end = await geocodeAddress(destination);
 
@@ -164,7 +164,7 @@ export const getRoutes = async (origin, destination) => {
     const body = {
       origin: { location: { latLng: { latitude: start.latitude, longitude: start.longitude } } },
       destination: { location: { latLng: { latitude: end.latitude, longitude: end.longitude } } },
-      travelMode: "WALK",
+      travelMode: travelMode,
       computeAlternativeRoutes: true
     };
     

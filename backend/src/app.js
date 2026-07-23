@@ -14,6 +14,9 @@ import heatmapRoutes from "./routes/heatmapRoutes.js";
 import journeyRoutes from "./routes/journeyRoutes.js";
 import sosRoutes from "./routes/sosRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import roomRoutes from "./routes/roomRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 // Middleware imports
 import errorMiddleware from "./middlewares/errorMiddleware.js";
@@ -66,6 +69,13 @@ app.use("/sos", sosRoutes);
 
 // 10. Notifications
 app.use("/api/notifications", notificationRoutes);
+
+// 11. Safety Rooms & Chat
+app.use("/api/rooms", roomRoutes);
+app.use("/api", messageRoutes);
+
+// 12. AI Assistant
+app.use("/api/ai", aiRoutes);
 
 // ── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", (req, res) => {

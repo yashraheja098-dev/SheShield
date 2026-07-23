@@ -80,14 +80,16 @@ export const routingApi = {
    *
    * @param {{ lat: number, lng: number, name?: string }} origin
    * @param {{ lat: number, lng: number, name?: string }} destination
+   * @param {string} travelMode - The mode of travel (WALK, BICYCLE, DRIVE)
    * @returns {Promise<RouteOption[]>}
    */
-  getSafeRoutes: async (origin, destination) => {
+  getSafeRoutes: async (origin, destination, travelMode = "WALK") => {
     try {
       // Backend accepts address strings OR { latitude, longitude } objects
       const res = await axiosInstance.post('/routes/analyze', {
         origin:      { latitude: origin.lat,      longitude: origin.lng },
         destination: { latitude: destination.lat, longitude: destination.lng },
+        travelMode
       });
 
       const rawRoutes = res.data?.routes || [];

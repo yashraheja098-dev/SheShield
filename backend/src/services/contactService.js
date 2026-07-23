@@ -38,7 +38,7 @@ export const addContact = async (userId, { name, phone, relationship, isPrimaryC
 
   // Add reference to User model
   await User.findByIdAndUpdate(userId, {
-    $push: { trustedContacts: newContact._id }
+    $push: { emergencyContacts: newContact._id }
   });
 
   return newContact;
@@ -86,7 +86,7 @@ export const removeContact = async (userId, contactId) => {
 
   // Remove reference from User model
   await User.findByIdAndUpdate(userId, {
-    $pull: { trustedContacts: contactId }
+    $pull: { emergencyContacts: contactId }
   });
 
   return deletedContact;

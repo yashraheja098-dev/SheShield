@@ -60,7 +60,7 @@ export const loginUser = async ({ email, password }) => {
 
 export const getUserProfile = async (userId) => {
   const user = await User.findById(userId)
-    .populate("trustedContacts")
+    .populate("emergencyContacts")
     .select("-password");
 
   if (!user) {

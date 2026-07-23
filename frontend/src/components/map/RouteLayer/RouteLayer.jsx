@@ -5,6 +5,7 @@ import useUiStore from '../../../stores/uiStore';
 import { APP_MODES } from '../../../constants/appConstants';
 import { routingApi } from '../../../services/api/routingApi';
 import useNavigationStore from '../../../stores/navigationStore';
+import useTravelModeStore from '../../../stores/travelModeStore';
 import './RouteLayer.css';
 
 const GooglePolyline = ({ positions, pathOptions, eventHandlers }) => {
@@ -73,8 +74,10 @@ const RouteLayer = () => {
   
   const pushToast = useUiStore((s) => s.pushToast);
   const appMode = useUiStore((s) => s.appMode);
+  
+  const travelMode = useTravelModeStore((s) => s.mode);
 
-  // Fetch routes when origin and destination change
+  // Fetch routes when origin, destination, or travelMode change
   useEffect(() => {
     const fetchRoutes = async () => {
       if (!origin || !destination) return;
@@ -83,7 +86,8 @@ const RouteLayer = () => {
       setError(null);
       
       try {
-        const fetchedRoutes = await routingApi.getSafeRoutes(origin, destination);
+        const apiTravelMode = travelMode === 'bike' ? 'BICYCLE' : travelMode === 'car' ? 'DRIVE' : 'WALK';
+        const fetchedRoutes = await routingApi.getSafeRoutes(origin, destination, apiTravelMode);
         setRoutes(fetchedRoutes);
         
         if (fetchedRoutes.length > 0 && fetchedRoutes[0].isMock) {
@@ -102,7 +106,7 @@ const RouteLayer = () => {
     };
     
     fetchRoutes();
-  }, [origin, destination, setRoutes, setLoading, setError]);
+  }, [origin, destination, travelMode, setRoutes, setLoading, setError]);
 
   // Fit map bounds to active route in PLANNING mode, or follow user in NAVIGATING mode
   useEffect(() => {

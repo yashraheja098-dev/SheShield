@@ -80,7 +80,7 @@ export const triggerSOS = async (userId, { latitude, longitude, audioUrl, videoU
   return {
     sosLog,
     nearestSafePoints: safePoints,
-    trustedContacts: sosContacts
+    emergencyContacts: sosContacts
   };
 };
 

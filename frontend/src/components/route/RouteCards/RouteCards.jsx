@@ -17,7 +17,7 @@ const getSafetyLabel = (score) => {
   return 'Dangerous 🔴';
 };
 
-const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation, durationMultiplier }) => {
+const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation }) => {
   const [isSafetyExpanded, setIsSafetyExpanded] = useState(false);
 
   const isSafe = route.safetyScore >= 80;
@@ -26,8 +26,7 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
   const scoreClass = isSafe ? 'score-safe' : (isWarning ? 'score-warning' : 'score-danger');
   const Icon = isSafe ? ShieldCheck : (isWarning ? Shield : ShieldAlert);
 
-  // Apply travel-mode multiplier at display time only; raw data stays untouched
-  const displayDuration = Math.round((route.duration ?? 0) * (durationMultiplier ?? 1));
+  const displayDuration = route.duration || 0;
 
   return (
     <div 
@@ -130,9 +129,8 @@ const RouteCards = () => {
   const setOrigin = useRouteStore((s) => s.setOrigin);
   const userPosition = useNavigationStore((s) => s.userPosition);
 
-  // Travel mode multiplier (live, reacts to selector changes)
+  // Travel mode (now fetched natively by API, multiplier no longer needed)
   const getMultiplier = useTravelModeStore((s) => s.getMultiplier);
-  const durationMultiplier = getMultiplier();
   
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [showPickupModal, setShowPickupModal] = useState(false);
@@ -227,7 +225,6 @@ const RouteCards = () => {
             route={route}
             isActive={index === activeRouteIndex}
             isExpanded={index === expandedIndex}
-            durationMultiplier={durationMultiplier}
             onToggleExpand={(e) => {
               e.stopPropagation();
               setExpandedIndex(expandedIndex === index ? null : index);

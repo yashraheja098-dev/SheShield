@@ -1,3 +1,5 @@
+import Message from "../models/Message.js";
+import Location from "../models/Location.js";
 const userSockets = new Map();
 
 /**
@@ -22,6 +24,73 @@ export const initSocket = (io) => {
       socket.join(journeyId.toString());
       console.log(`Socket ${socket.id} joined journey: ${journeyId}`);
     });
+
+    // ── Safety Rooms Chat & Tracking ─────────────────────────────────────────
+    socket.on("join-room", (roomId) => {
+      socket.join(`room_${roomId}`);
+      console.log(`Socket ${socket.id} joined room: ${roomId}`);
+    });
+
+    socket.on("leave-room", (roomId) => {
+      socket.leave(`room_${roomId}`);
+      console.log(`Socket ${socket.id} left room: ${roomId}`);
+    });
+
+    socket.on("send-message", async (data) => {
+      try {
+        // data expects: { roomId, messageId, senderId, senderName, message, timestamp }
+        const { roomId, messageId, senderId, senderName, message, timestamp } = data;
+        
+        // Save to DB
+        const newMessage = new Message({
+          messageId,
+          roomId,
+          senderId,
+          senderName,
+          message,
+          createdAt: timestamp || Date.now()
+        });
+        await newMessage.save();
+
+        // Broadcast to room
+        io.to(`room_${roomId}`).emit("receive-message", data);
+      } catch (error) {
+        console.error("Error saving message via socket:", error);
+      }
+    });
+
+    socket.on("typing", (data) => {
+      // data: { roomId, senderName }
+      socket.to(`room_${data.roomId}`).emit("typing", data);
+    });
+
+    socket.on("stop-typing", (data) => {
+      // data: { roomId, senderName }
+      socket.to(`room_${data.roomId}`).emit("stop-typing", data);
+    });
+
+    socket.on("update-location", async (data) => {
+      try {
+        // data expects: { roomId, userId, latitude, longitude, timestamp }
+        const { roomId, userId, latitude, longitude, timestamp } = data;
+        
+        // Save to DB
+        const newLocation = new Location({
+          roomId,
+          userId,
+          latitude,
+          longitude,
+          timestamp: timestamp || Date.now()
+        });
+        await newLocation.save();
+
+        // Broadcast to room
+        io.to(`room_${roomId}`).emit("receive-location", data);
+      } catch (error) {
+        console.error("Error saving location via socket:", error);
+      }
+    });
+    // ─────────────────────────────────────────────────────────────────────────
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);

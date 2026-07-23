@@ -5,7 +5,7 @@ import { successResponse } from "../utils/responseFormatter.js";
 
 export const handleAnalyzeRoutes = async (req, res, next) => {
   try {
-    const { origin, destination } = req.body;
+    const { origin, destination, travelMode } = req.body;
 
     if (!origin || !destination) {
       const error = new Error("Both origin and destination are required.");
@@ -14,7 +14,7 @@ export const handleAnalyzeRoutes = async (req, res, next) => {
     }
 
     // 1. Fetch routes from Google maps wrapper
-    const rawRoutes = await getRoutes(origin, destination);
+    const rawRoutes = await getRoutes(origin, destination, travelMode || "WALK");
 
     // 2. Decode and analyze each route
     const analyzedRoutes = await Promise.all(
