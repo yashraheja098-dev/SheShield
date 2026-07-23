@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Remove /api from the end of the URL for Socket.IO connection
+const SOCKET_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 
 class SocketService {
   constructor() {
@@ -12,8 +14,7 @@ class SocketService {
       return this.socket;
     }
 
-    this.socket = io(API_BASE_URL, {
-      transports: ['websocket'],
+    this.socket = io(SOCKET_URL, {
       autoConnect: true,
     });
 
